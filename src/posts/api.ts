@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { omit } from 'lodash'
 
 axios.defaults.headers.common = {
   'no-auth': 1
@@ -31,6 +32,21 @@ export async function getPost(id: number) {
 export async function deletePost(id: number) {
   try {
     const res = await axios.delete(`/posts/${id}`)
+    return res
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+export async function cupdatePost(post: TPost) {
+  try {
+    let res
+    if (post.id > 0) {
+      res = await axios.put(`/posts/${post.id}`, post)
+    } else {
+      res = await axios.post(`/posts`, omit(post, 'id'))      
+    }
+
     return res
   } catch (err) {
     console.error(err)

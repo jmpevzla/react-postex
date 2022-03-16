@@ -1,7 +1,7 @@
 interface TPost {
   id: number,
-  title: String,
-  author: String
+  title: string,
+  author: string
 }
 
 type TPosts = TPost[]

@@ -9,6 +9,7 @@ import { useSearch } from "../lists/search"
 import { useSort } from "../lists/sort"
 import { deletePost, getPost } from "./api"
 import Post from "./components/Post"
+import PostForm from "./components/PostForm"
 
 const reactSwal = withReactContent(Swal)
 
@@ -96,11 +97,13 @@ function List() {
   }
 
   async function openCreate() {
-    await Swal.fire(
-      'Create Post!',
-      'Create Here!',
-      'success'
-    )
+    // await Swal.fire(
+    //   'Create Post!',
+    //   'Create Here!',
+    //   'success'
+    // )
+
+    showPostForm()
   }
   async function openShow(id: number) {
     
@@ -112,10 +115,14 @@ function List() {
       html: (<Post post={post} />)
     })
   }
+
   async function openDelete(id: number) {
     const res = await getPost(id)
     const post: TPost = res?.data 
 
+    onDelete(post)
+  }
+  async function onDelete(post: TPost) {
     const response = await reactSwal.fire({
       title: 'Delete Post!',
       html: (<Post post={post} />),
@@ -126,16 +133,48 @@ function List() {
     })
 
     if (response.isConfirmed) {
-      const res = await deletePost(id)
+      const res = await deletePost(post.id)
    
       if (res?.status == 200) {
         return Swal.fire('OK', 'Post Deleted!', 'success')  
       }
 
-      Swal.fire('error', 'Try again!', 'error')
+      await Swal.fire('error', 'Try again!', 'error')
+      onDelete(post)
     }
+  }
 
-    console.log(response)
+  async function showPostForm({ post = null }: { post?: TPost | null } = {}) {
+    await reactSwal.fire({
+      title: `${ post && post.id > 0 ? 'Edit' : 'Create'} Post`,
+      html: (<PostForm post={post} />),
+      showCancelButton: true,
+      showDenyButton: true,
+      confirmButtonText: 'Ok',
+      cancelButtonText: 'Cancel',
+      denyButtonText: 'Reset',
+      reverseButtons: true,
+      showLoaderOnConfirm: true,
+      showLoaderOnDeny: true,
+      preDeny: () => false,
+      preConfirm: () => {
+        return new Promise<boolean>((resolve) => {
+          const listener = (ev: Event) => {
+            const customEv = ev as CustomEvent<boolean>
+            resolve(customEv.detail)
+          }
+          
+          window.addEventListener('modal-confirm', listener, { once: true })  
+        })
+      }
+    })
+  }
+
+  async function openEdit(id: number) {
+    const res = await getPost(id)
+    const post: TPost = res?.data 
+
+    showPostForm({ post })
   }
 
   return (
@@ -167,6 +206,8 @@ function List() {
           <ShowSortDir fieldState={sort.sort} field="author" sortDir={sort.dir} />
         </button>
       </div>
+      
+      {/* daisyUI */}
       <div className="mt-5">
         <label htmlFor="post-modal" className="btn btn-primary">
           Create / Edit
@@ -178,9 +219,13 @@ function List() {
           Delete
         </label>
       </div>
+      {/* SwalAlert */}
       <div className="mt-5">
         <button className="btn btn-primary" onClick={openCreate}>
-          Create / Edit
+          Create
+        </button>
+        <button className="btn btn-primary" onClick={() => openEdit(randomId())}>
+          Edit
         </button>
         <button className="btn btn-info" onClick={() => openShow(randomId())}>
           Show
