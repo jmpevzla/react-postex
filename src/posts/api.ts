@@ -18,3 +18,21 @@ export async function getPosts(query: Record<string, string | number>) {
     console.error(err)   
   }
 }
+
+export async function getPost(id: number) {
+  try {
+    const res = await axios.get(`/posts/${id}`)
+    return res
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+export async function deletePost(id: number) {
+  try {
+    const res = await axios.delete(`/posts/${id}`)
+    return res
+  } catch (err) {
+    console.error(err)
+  }
+}

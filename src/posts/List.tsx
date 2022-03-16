@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useEffect, useState, useRef } from "react"
 import Swal from "sweetalert2"
 import withReactContent from "sweetalert2-react-content"
 import { ShowSortDir } from "../components/sort"
@@ -7,6 +7,8 @@ import { actionInputSearch, actionGetOnSort,
   actionInit, useActionGetPostDebounce } from "../lists/actions"
 import { useSearch } from "../lists/search"
 import { useSort } from "../lists/sort"
+import { deletePost, getPost } from "./api"
+import Post from "./components/Post"
 
 const reactSwal = withReactContent(Swal)
 
@@ -22,6 +24,9 @@ function List() {
   ])
 
   const actionGetPostDeb = useActionGetPostDebounce()
+
+  const [ stPost, setStPost ] = useState({ id: 0, title: '', author: '' }) as unknown as [TPost, React.Dispatch<React.SetStateAction<TPost>>]
+  const refDeleteModal = useRef(null) as unknown as React.MutableRefObject<HTMLInputElement>
 
   useEffect(() => {
     actionInit({
@@ -50,6 +55,46 @@ function List() {
     setSort: setSortState
   })
 
+  ///
+  function randomId() {
+    let randomId = 0
+    while (randomId < 2) {
+      randomId = Math.ceil((Math.random() * 100)) % 7
+    }
+    return randomId
+  }
+
+  async function showPost(id: number) {
+    const res = await getPost(id)
+    const post: TPost = res?.data 
+
+    setStPost(post)
+  }
+
+  async function deleteConfirmPost(id: number) {
+    const res = await getPost(id)
+    const post: TPost = res?.data 
+
+    setStPost(post)
+  }
+
+  async function xDeletePost(id: number) {
+    const res = await deletePost(id)
+   
+    if (res?.status == 200) {
+      const checked = refDeleteModal.current.checked
+      refDeleteModal.current.checked = !checked
+      
+      return setStPost({
+        id: 0,
+        title: '',
+        author: ''
+      })
+    }
+
+    Swal.fire('error', 'Try again!', 'error')
+  }
+
   async function openCreate() {
     await Swal.fire(
       'Create Post!',
@@ -57,29 +102,40 @@ function List() {
       'success'
     )
   }
-  async function openShow() {
-    await Swal.fire(
-      'Show Post!',
-      'Show Here!',
-      'success'
-    )
-  }
-  async function openDelete() {
+  async function openShow(id: number) {
+    
+    const res = await getPost(id)
+    const post: TPost = res?.data 
+
     await reactSwal.fire({
-      title: 'Delete Post!',
-      // icon: 'question',
-      showCloseButton: true,
-      showCancelButton: true,
-      confirmButtonText: 'Yes!',
-      cancelButtonText: 'Nope!',
-      html: (
-        <div>
-          <h3>Create Post!</h3>
-          <p>You can create a post here!</p>
-          <input type="text" className="input input-bordered input-md input-primary max-w-xs" placeholder="title?" />
-        </div>
-      )
+      title: 'Show Post!',
+      html: (<Post post={post} />)
     })
+  }
+  async function openDelete(id: number) {
+    const res = await getPost(id)
+    const post: TPost = res?.data 
+
+    const response = await reactSwal.fire({
+      title: 'Delete Post!',
+      html: (<Post post={post} />),
+      showCancelButton: true,
+      confirmButtonText: 'Ok',
+      cancelButtonText: 'Cancel',
+      reverseButtons: true
+    })
+
+    if (response.isConfirmed) {
+      const res = await deletePost(id)
+   
+      if (res?.status == 200) {
+        return Swal.fire('OK', 'Post Deleted!', 'success')  
+      }
+
+      Swal.fire('error', 'Try again!', 'error')
+    }
+
+    console.log(response)
   }
 
   return (
@@ -115,10 +171,10 @@ function List() {
         <label htmlFor="post-modal" className="btn btn-primary">
           Create / Edit
         </label>
-        <label htmlFor="show-modal" className="btn btn-info">
+        <label htmlFor="show-modal" className="btn btn-info" onClick={() => showPost(randomId())}>
           Show
         </label>
-        <label htmlFor="delete-modal" className="btn !bg-red-500 border-0">
+        <label htmlFor="delete-modal" className="btn !bg-red-500 border-0" onClick={() => deleteConfirmPost(randomId())}>
           Delete
         </label>
       </div>
@@ -126,10 +182,10 @@ function List() {
         <button className="btn btn-primary" onClick={openCreate}>
           Create / Edit
         </button>
-        <button className="btn btn-info" onClick={openShow}>
+        <button className="btn btn-info" onClick={() => openShow(randomId())}>
           Show
         </button>
-        <button className="btn !bg-red-500 border-0" onClick={openDelete}>
+        <button className="btn !bg-red-500 border-0" onClick={() => openDelete(randomId())}>
           Delete
         </button>
       </div>
@@ -148,21 +204,24 @@ function List() {
       <input type="checkbox" id="show-modal" className="modal-toggle" />
       <div className="modal items-center">
         <div className="modal-box">
-          <h3 className="font-bold text-lg">Modal Show!</h3>
-          <p>Show Elements!</p>
+          <h3 className="font-bold text-xl text-center">Show Post!</h3>
+          <Post post={stPost} />
           <div className="modal-action">
             <label htmlFor="show-modal" className="btn btn-primary">Ok</label>
           </div>
         </div>
       </div>
 
-      <input type="checkbox" id="delete-modal" className="modal-toggle" />
+      <input type="checkbox" id="delete-modal" className="modal-toggle" ref={refDeleteModal} />
       <div className="modal items-center">
         <div className="modal-box">
-          <h3 className="font-bold text-lg">Modal Delete!</h3>
-          <p>Are you sure?</p>
+          <h3 className="font-bold text-3xl text-red-600 text-center">Delete Post!</h3>
+          <Post post={stPost} />
+          <p className="text-center text-xl font-bold">Are you sure?</p>
           <div className="modal-action">
-            <label htmlFor="delete-modal" className="btn text-white bg-red-700">Ok</label>
+            <label htmlFor="delete-modal" className="btn text-white ">Cancel</label>
+            <button className="btn text-white bg-red-700"
+              onClick={() => xDeletePost(stPost.id)}>Ok</button>
           </div>
         </div>
       </div>
