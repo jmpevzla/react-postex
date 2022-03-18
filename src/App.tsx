@@ -1,44 +1,57 @@
-import { useState } from 'react'
-import logo from './logo.svg'
-import './App.css'
-
+import { Link, Route } from 'wouter'
+import Posts from './posts/List'
+import Page401 from './errors/Page401'
+import Page404 from './errors/Page404'
+import Page500 from './errors/Page500'
+import AboutMe from './aboutme/AboutMe'
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>Hello Vite + React!</p>
-        <p>
-          <button type="button" onClick={() => setCount((count) => count + 1)}>
-            count is: {count}
-          </button>
-        </p>
-        <p>
-          Edit <code>App.tsx</code> and save to test HMR updates.
-        </p>
-        <p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          {' | '}
-          <a
-            className="App-link"
-            href="https://vitejs.dev/guide/features.html"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Vite Docs
-          </a>
-        </p>
+    <div>
+      <header>
+        <nav>
+          <Link href="/login">
+            <a className="link">login</a>
+          </Link> | 
+          <Link href="/register">
+            <a className="link">register</a>
+          </Link> | 
+          <Link href="/">
+            <a className="link">posts</a>
+          </Link> | 
+          <Link href="/about-me">
+            <a className="link">About Me</a>
+          </Link> |
+          <Link href="/401">
+            <a className="link">Unauthorized</a>
+          </Link> |
+          <Link href="/404">
+            <a className="link">Not Found</a>
+          </Link> |
+          <Link href="/500">
+            <a className="link">Server Error</a>
+          </Link>
+        </nav>
       </header>
+
+      <Route path="/login">
+        <p> LOGIN! </p>
+      </Route>
+      <Route path="/register">
+        <p> REGISTER! </p>
+      </Route>
+      <Route path="/" component={Posts} />
+      <Route path="/about-me" component={AboutMe} />
+      <Route path="/401" component={Page401} />
+      <Route path="/404" component={Page404} />
+      <Route path="/500" component={Page500} />
+
+      
+      {/* <Route path="/users/:name">
+        {(params) => <div>Hello, {params.name}!</div>}
+      </Route>
+      <Route path="/inbox" component={InboxPage} /> */}
     </div>
   )
 }
