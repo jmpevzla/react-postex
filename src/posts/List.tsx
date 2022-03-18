@@ -1,13 +1,14 @@
 import { useEffect, useState, useRef } from "react"
 import Swal from "sweetalert2"
 import withReactContent from "sweetalert2-react-content"
+import { useLocation } from "wouter"
 import { ShowSortDir } from "../components/sort"
 import { useQuery } from "../global/query"
 import { actionInputSearch, actionGetOnSort, 
   actionInit, useActionGetPostDebounce } from "../lists/actions"
 import { useSearch } from "../lists/search"
 import { useSort } from "../lists/sort"
-import { deletePost, getPost } from "./api"
+import { deletePost, getPost, logout } from "./api"
 import Post from "./components/Post"
 import PostForm from "./components/PostForm"
 
@@ -26,6 +27,7 @@ function List() {
 
   const actionGetPostDeb = useActionGetPostDebounce()
 
+  const [, setLoc] = useLocation()
   const [ stPost, setStPost ] = useState({ id: 0, title: '', author: '' }) as unknown as [TPost, React.Dispatch<React.SetStateAction<TPost>>]
   const refDeleteModal = useRef(null) as unknown as React.MutableRefObject<HTMLInputElement>
 
@@ -177,6 +179,26 @@ function List() {
     showPostForm({ post })
   }
 
+  async function onLogout() {
+    const res = await logout()
+
+    if(res.ok) {
+      window.localStorage.removeItem('postex-token')
+      return setLoc('/login')
+    }
+    
+    Swal.fire({
+      title: 'Error!',
+      icon: 'error',
+      toast: true,
+      text: res.error,
+      timer: 2000,
+      position: 'top',
+      timerProgressBar: true,
+      showConfirmButton: false
+    })
+  }
+
   return (
     <div>
       <div className="mb-2">
@@ -232,6 +254,11 @@ function List() {
         </button>
         <button className="btn !bg-red-500 border-0" onClick={() => openDelete(randomId())}>
           Delete
+        </button>
+      </div>
+      <div>
+        <button className="btn !bg-black text-white border-0" onClick={onLogout}>
+          Logout
         </button>
       </div>
 

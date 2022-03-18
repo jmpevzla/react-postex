@@ -7,7 +7,7 @@ function Page401() {
   const [progress, setProgress] = useState(0)
   
   useEffect(() => {
-    setTimeout(() => {
+    const timeout = setTimeout(() => {
       setLoc('/login')
     }, 10000)
 
@@ -16,6 +16,7 @@ function Page401() {
     }, 1000)
 
     return () => {
+      clearTimeout(timeout)
       clearInterval(interval)
     }
   }, [])

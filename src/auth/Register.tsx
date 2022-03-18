@@ -3,7 +3,7 @@ import { useCallback } from 'react'
 
 interface TRegister {
   name: string,
-  username: string,
+  email: string,
   password: string,
   confPassword: string
 }
@@ -19,14 +19,14 @@ function Register() {
       errors.name = 'Required'
     }
    
-    if (!values.username.match(/^[A-Za-z]/)) {
-      errors.username = 'Username should begin with alphabetic char'
+    if (!values.email.match(/^[A-Za-z]/)) {
+      errors.email = 'Email should begin with alphabetic char'
     }
-    if (values.username.length < 6 || values.username.length > 20) {
-      errors.username = 'Username should be at least 6 until 20 alphanumerics'
+    if (values.email.length < 6 || values.email.length > 20) {
+      errors.email = 'Email should be at least 6 until 20 alphanumerics'
     }
-    if (!values.username) {
-      errors.username = 'Required'
+    if (!values.email) {
+      errors.email = 'Required'
     }
     
     if (values.password !== values.confPassword) {
@@ -48,7 +48,7 @@ function Register() {
   const formFormik = useFormik<TRegister>({
     initialValues: {
       name: '',
-      username: '',
+      email: '',
       password: '',
       confPassword: ''
     },
@@ -75,20 +75,19 @@ function Register() {
             <p className="text-error font-bold w-48">{formFormik.errors.name}</p>}
         </div>
         <div className="mb-3">
-          <label htmlFor="inputUsername" className="label font-bold">Username</label>
-          <input id="inputUsername" className="input input-bordered input-primary"
-            name="username" 
-            value={formFormik.values.username} 
+          <label htmlFor="inputEmail" className="label font-bold">Email</label>
+          <input id="inputEmail" className="input input-bordered input-primary"
+            type="email" name="email" 
+            value={formFormik.values.email} 
             onChange={formFormik.handleChange} 
             />
-          {formFormik.errors.username && 
-            <p className="text-error font-bold w-48">{formFormik.errors.username}</p>}
+          {formFormik.errors.email && 
+            <p className="text-error font-bold w-48">{formFormik.errors.email}</p>}
         </div>
         <div className="mb-3">
           <label htmlFor="inputPassword" className="label font-bold">Password</label>
-          <input id="inputPassword" type="password"
-            className="input input-bordered input-primary" 
-            name="password"
+          <input id="inputPassword" className="input input-bordered input-primary" 
+            type="password" name="password" 
             value={formFormik.values.password}
             onChange={formFormik.handleChange}
             />
@@ -97,9 +96,8 @@ function Register() {
         </div>
         <div className="mb-3">
           <label htmlFor="inputConfPassword" className="label font-bold">Confirm Password</label>
-          <input id="inputConfPassword" type="password"
-            className="input input-bordered input-primary" 
-            name="confPassword"
+          <input id="inputConfPassword" className="input input-bordered input-primary" 
+            type="password" name="confPassword" 
             value={formFormik.values.confPassword}
             onChange={formFormik.handleChange}
             />
