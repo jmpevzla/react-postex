@@ -1,9 +1,11 @@
-import { Link, Route } from 'wouter'
+import { Link, Route, Router, Switch } from 'wouter'
+import RouteAuth from './components/RouteAuth'
 import Posts from './posts/List'
-import Page401 from './errors/Page401'
 import Page404 from './errors/Page404'
 import Page500 from './errors/Page500'
 import AboutMe from './aboutme/AboutMe'
+import Login from './auth/Login'
+import Register from './auth/Register'
 
 function App() {
 
@@ -35,18 +37,16 @@ function App() {
         </nav>
       </header>
 
-      <Route path="/login">
-        <p> LOGIN! </p>
-      </Route>
-      <Route path="/register">
-        <p> REGISTER! </p>
-      </Route>
-      <Route path="/" component={Posts} />
-      <Route path="/about-me" component={AboutMe} />
-      <Route path="/401" component={Page401} />
-      <Route path="/404" component={Page404} />
-      <Route path="/500" component={Page500} />
-
+      <Router>
+        <Switch>
+          <Route path="/login" component={Login} />
+          <Route path="/register" component={Register} />
+          <RouteAuth path="/about-me" component={AboutMe} />
+          <Route path="/500" component={Page500} />
+          <RouteAuth path="/" component={Posts} />
+          <Route component={Page404} />
+        </Switch>
+      </Router>
       
       {/* <Route path="/users/:name">
         {(params) => <div>Hello, {params.name}!</div>}
