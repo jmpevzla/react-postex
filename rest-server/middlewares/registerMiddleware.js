@@ -24,8 +24,9 @@ async function getUser(email) {
     return resp.data.length === 0 ? null: resp.data[0]
 }
 
-async function createUser(email, password) {
+async function createUser({ name, email, password }) {
     const resp = await axios.post(urlUsers, {
+        name,
         email,
         password 
     })
@@ -37,7 +38,7 @@ module.exports = async (req, res, next) => {
     if (req.path === '/register' && req.method === 'POST') {
         try {
             urlUsers = createUrlUsers(req)
-            const { email, password } = req.body
+            const { name, email, password } = req.body
             const user = await getUser(email)
             
             if (user) {
@@ -45,14 +46,14 @@ module.exports = async (req, res, next) => {
             }
 
             // create user
-            const newUser = await createUser(email, password)
+            const newUser = await createUser({ name, email, password })
 
             // return jwt
             const token = jwt.sign({ id: newUser.id }, JWTSECRET, { expiresIn: '7d' })
 
             return res.json({
                 token,
-                newUser,
+                user: newUser,
                 message: 'Registration successful!'
             })
 

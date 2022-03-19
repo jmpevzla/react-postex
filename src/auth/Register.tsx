@@ -1,5 +1,9 @@
 import { useFormik } from 'formik'
 import { useCallback } from 'react'
+import axios from 'axios'
+import Swal from 'sweetalert2'
+import { useLocation } from 'wouter'
+
 
 interface TRegister {
   name: string,
@@ -9,6 +13,8 @@ interface TRegister {
 }
 
 function Register() {
+  const [, setLoc] = useLocation()
+
   const validate = useCallback((values: TRegister) => {
     const errors: Record<string, string> = {} 
    
@@ -22,8 +28,8 @@ function Register() {
     if (!values.email.match(/^[A-Za-z]/)) {
       errors.email = 'Email should begin with alphabetic char'
     }
-    if (values.email.length < 6 || values.email.length > 20) {
-      errors.email = 'Email should be at least 6 until 20 alphanumerics'
+    if (values.email.length < 6 || values.email.length > 50) {
+      errors.email = 'Email should be at least 6 until 50 alphanumerics'
     }
     if (!values.email) {
       errors.email = 'Required'
@@ -54,8 +60,37 @@ function Register() {
     },
     validate,
     validateOnChange: false,
-    onSubmit: (values) => {
-      console.log(values)
+    onSubmit: async (values) => {
+      try {
+        const res = await axios.post('/register', values)
+       
+        await Swal.fire({
+          title: 'Success!',
+          icon: 'success',
+          text: res.data.message,
+          toast: true,
+          timerProgressBar: true,
+          timer: 2000,
+          position: 'top',
+          showConfirmButton: false
+        })
+        
+        try {
+          window.localStorage.setItem('postex-token', res.data.token)
+          setLoc('/')
+        } catch(err) {
+          console.error(err)
+        }
+
+      } catch (err: any) {
+        console.error(err)
+        Swal.fire({
+          title: 'Error!',
+          icon: 'error',
+          text: `${err.message}`,
+          confirmButtonText: 'Ok'
+        })
+      }
     },
   })
 
