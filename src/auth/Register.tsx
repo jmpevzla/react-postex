@@ -1,5 +1,5 @@
 import { useFormik } from 'formik'
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import { useLocation } from 'wouter'
@@ -14,6 +14,13 @@ interface TRegister {
 
 function Register() {
   const [, setLoc] = useLocation()
+
+  useEffect(() => {
+    const token = window.localStorage.getItem('postex-token')
+    if (token) {
+      setLoc('/')
+    }
+  }, [])
 
   const validate = useCallback((values: TRegister) => {
     const errors: Record<string, string> = {} 

@@ -11,6 +11,7 @@ import { useSort } from "@/lists/sort"
 import { deletePost, getPost, logout } from "./api"
 import Post from "./components/Post"
 import PostForm from "./components/PostForm"
+import { themeChange } from 'theme-change'
 
 const reactSwal = withReactContent(Swal)
 
@@ -37,6 +38,8 @@ function List() {
       setSort: setSortState,
       setQuery: setQueryState
     })
+
+    themeChange(false)
   }, [])
 
   function onInputSearch(ev: React.FormEvent<HTMLInputElement>) {
@@ -261,6 +264,9 @@ function List() {
           Logout
         </button>
       </div>
+      <button className="btn btn-primary" data-toggle-theme="light,dark" data-act-class="btn-error">
+        change theme
+      </button>
 
       <input type="checkbox" id="post-modal" className="modal-toggle" />
       <div className="modal items-center">

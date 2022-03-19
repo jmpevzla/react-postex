@@ -5,3 +5,5 @@ interface TPost {
 }
 
 type TPosts = TPost[]
+
+declare module "theme-change";

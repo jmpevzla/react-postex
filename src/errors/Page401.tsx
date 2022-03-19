@@ -30,7 +30,7 @@ function Page401() {
       </p>
       <div className="mx-auto">
         <p>In ten seconds you will be redirect to login page...</p>
-        <progress value={progress} />
+        <progress className="progress" value={progress} />
       </div>
     </div>
   )

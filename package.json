@@ -19,6 +19,7 @@
     "react-query": "^3.34.16",
     "sweetalert2": "^11.4.4",
     "sweetalert2-react-content": "^4.2.0",
+    "theme-change": "^2.0.2",
     "wouter": "^2.8.0-alpha.2"
   },
   "devDependencies": {
