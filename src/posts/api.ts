@@ -76,3 +76,20 @@ export async function logout() {
     return {ok: false, error: err.message}
   }
 }
+
+export async function upload(id: number, file: File) {
+  try {
+    const formData = new FormData()
+    formData.append('photo', file)
+    const res = await axios.post(`/posts/upload/${id}`, formData, {
+      headers: {
+        'content-type': 'multipart/form-data'
+      }
+    })
+    
+    return {ok: true, error: ''}
+  } catch (err: any) {
+    console.error(err)
+    return {ok: false, error: err.message}
+  }
+}

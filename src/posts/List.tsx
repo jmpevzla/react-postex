@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState, useRef, ChangeEvent } from "react"
 import Swal from "sweetalert2"
 import withReactContent from "sweetalert2-react-content"
 import { useLocation } from "wouter"
@@ -8,7 +8,7 @@ import { actionInputSearch, actionGetOnSort,
   actionInit, useActionGetPostDebounce } from "@/lists/actions"
 import { useSearch } from "@/lists/search"
 import { useSort } from "@/lists/sort"
-import { deletePost, getPost, logout } from "./api"
+import { deletePost, getPost, logout, upload } from "./api"
 import Post from "./components/Post"
 import PostForm from "./components/PostForm"
 import { themeChange } from 'theme-change'
@@ -31,7 +31,16 @@ function List() {
   const [, setLoc] = useLocation()
   const [ stPost, setStPost ] = useState({ id: 0, title: '', author: '' }) as unknown as [TPost, React.Dispatch<React.SetStateAction<TPost>>]
   const refDeleteModal = useRef(null) as unknown as React.MutableRefObject<HTMLInputElement>
-
+  const [ photo, setPhoto ] = useState({
+    preview: '',
+    name: '',
+    file: null
+  } as {
+    preview: string,
+    name: string,
+    file: File | null
+  })
+  
   useEffect(() => {
     actionInit({
       setSearch: setSearchState,
@@ -202,6 +211,78 @@ function List() {
     })
   }
 
+  async function onSubmitPhoto(ev: React.FormEvent<HTMLFormElement>) {
+    ev.preventDefault()
+    
+    if (photo.file) {
+      const res = await upload(3, photo.file)
+      if (res.ok) {
+        Swal.fire({
+          title: 'Upload Complete!',
+          icon: 'success',
+          toast: true,
+          text: 'The photo was uploaded correctly!',
+          timer: 2000,
+          position: 'top',
+          timerProgressBar: true,
+          showConfirmButton: false
+        })
+
+      } else {
+        Swal.fire({
+          title: 'Error!',
+          icon: 'error',
+          toast: true,
+          text: res.error,
+          timer: 2000,
+          position: 'top',
+          timerProgressBar: true,
+          showConfirmButton: false
+        })
+      }
+    }
+  }
+
+  function onChangePhoto(ev: ChangeEvent<HTMLInputElement>) {
+    const files = ev.currentTarget.files 
+    URL.revokeObjectURL(photo.preview)
+    if (files && files.length > 0) {
+      let ok = true
+      switch(files[0].type) {
+        case 'image/jpeg':
+          break
+        case 'image/png':          
+          break
+        case 'image/gif':
+          break
+        case 'image/svg+xml':
+          break
+        default:
+          ok = false
+      }
+
+      if (ok) {
+        const url = URL.createObjectURL(files[0])
+        setPhoto({
+          preview: url,
+          name: files[0].name,
+          file: files[0]
+        })
+      } else {
+        setPhoto({
+          name: '',
+          preview: '',
+          file: null
+        })
+        Swal.fire({
+          title: 'Error',
+          icon: 'error',
+          text: 'File is not valid!'
+        })
+      }
+    }
+  }
+
   return (
     <div>
       <div className="mb-2">
@@ -267,6 +348,22 @@ function List() {
       <button className="btn btn-primary" data-toggle-theme="light,dark" data-act-class="btn-error">
         change theme
       </button>
+      
+      <form className="mt-3" onSubmit={onSubmitPhoto}>
+          {photo.preview && <div className="mb-2">
+            <label htmlFor="file">
+              <img alt="photo" src={photo.preview} className="w-32" />
+              <p>{photo.name}</p>
+            </label>
+          </div>}
+          <div className="form-group">
+            <input id="file" type="file" className="form-control-file hidden" 
+              name="photo" onChange={onChangePhoto} 
+              accept=".jpg,.gif,.svg,.png" title="" value="" />
+            <label htmlFor="file" className="btn btn-info">Select Photo</label>
+          </div>
+          <input type="submit" value="Upload!" className="btn btn-default" />            
+      </form>
 
       <input type="checkbox" id="post-modal" className="modal-toggle" />
       <div className="modal items-center">
