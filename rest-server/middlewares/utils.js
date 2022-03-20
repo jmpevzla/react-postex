@@ -1,7 +1,16 @@
+function getRoot(req) {
+  return `http://${req.connection.localAddress}:${req.connection.localPort}`
+}
+
 function createUrlUsers(req) {
-    return `http://${req.connection.localAddress}:${req.connection.localPort}/users`
+    return `${getRoot(req)}/users`
+}
+
+function createUrlPosts(req) {
+  return `${getRoot(req)}/posts`
 }
 
 module.exports = {
-    createUrlUsers   
+    createUrlUsers,
+    createUrlPosts
 }
