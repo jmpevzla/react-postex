@@ -1,4 +1,4 @@
-function getRoot(req) {
+export function getRoot(req) {
   return `http://${req.connection.localAddress}:${req.connection.localPort}`
 }
 

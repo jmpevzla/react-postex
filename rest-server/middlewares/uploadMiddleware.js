@@ -1,7 +1,7 @@
 const Axios = require('axios').default
 const fs = require('fs')
 const multer  = require('multer')
-const { createUrlPosts } = require('./utils')
+const { createUrlPosts, getRoot } = require('./utils')
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -53,6 +53,7 @@ module.exports = [upload.single('photo'), async (req, res, next) => {
           ...post,
           photo
         })
+        
         return res.json({ id, photo, ok: true, error: '' })
       } catch(err) {
         console.error(err)

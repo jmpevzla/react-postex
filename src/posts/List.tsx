@@ -8,7 +8,7 @@ import { actionInputSearch, actionGetOnSort,
   actionInit, useActionGetPostDebounce } from "@/lists/actions"
 import { useSearch } from "@/lists/search"
 import { useSort } from "@/lists/sort"
-import { deletePost, getPost, logout, upload } from "./api"
+import { deletePost, getPost, getPosts, logout, upload } from "./api"
 import Post from "./components/Post"
 import PostForm from "./components/PostForm"
 import { themeChange } from 'theme-change'
@@ -40,6 +40,12 @@ function List() {
     name: string,
     file: File | null
   })
+  const [ list, setList ] = useState([] as [{
+    id: number,
+    title: string,
+    author: string,
+    photo: string | null
+  }] | []) 
   
   useEffect(() => {
     actionInit({
@@ -47,6 +53,18 @@ function List() {
       setSort: setSortState,
       setQuery: setQueryState
     })
+
+    async function init() {
+      const res = await getPosts({})
+      const data = res?.data.map((value: any) => {
+        return {
+          ...value,
+          photo: value.photo ? 'http://localhost:4000/' + value.photo : null
+        }
+      })
+      setList(data)
+    }
+    init()
 
     themeChange(false)
   }, [])
@@ -297,73 +315,97 @@ function List() {
           onInput={onInputSearch}
         />
       </div>
-      <div>
-        <h2 className="font-bold">Sort</h2>
-        <button className="btn btn-primary" onClick={getOnSortClick('id')}>
-          <span>ID</span> 
-          <ShowSortDir fieldState={sort.sort} field="id" sortDir={sort.dir} />
-        </button>
-        <button className="btn btn-secondary" onClick={getOnSortClick('title')}>
-          <span>Title</span> 
-          <ShowSortDir fieldState={sort.sort} field="title" sortDir={sort.dir} />
-        </button>
-        <button className="btn btn-info" onClick={getOnSortClick('author')}>
-          <span>Author</span>
-          <ShowSortDir fieldState={sort.sort} field="author" sortDir={sort.dir} />
-        </button>
-      </div>
-      
-      {/* daisyUI */}
-      <div className="mt-5">
-        <label htmlFor="post-modal" className="btn btn-primary">
-          Create / Edit
-        </label>
-        <label htmlFor="show-modal" className="btn btn-info" onClick={() => showPost(randomId())}>
-          Show
-        </label>
-        <label htmlFor="delete-modal" className="btn !bg-red-500 border-0" onClick={() => deleteConfirmPost(randomId())}>
-          Delete
-        </label>
-      </div>
-      {/* SwalAlert */}
-      <div className="mt-5">
-        <button className="btn btn-primary" onClick={openCreate}>
-          Create
-        </button>
-        <button className="btn btn-primary" onClick={() => openEdit(randomId())}>
-          Edit
-        </button>
-        <button className="btn btn-info" onClick={() => openShow(randomId())}>
-          Show
-        </button>
-        <button className="btn !bg-red-500 border-0" onClick={() => openDelete(randomId())}>
-          Delete
-        </button>
-      </div>
-      <div>
-        <button className="btn !bg-black text-white border-0" onClick={onLogout}>
-          Logout
-        </button>
-      </div>
-      <button className="btn btn-primary" data-toggle-theme="light,dark" data-act-class="btn-error">
-        change theme
-      </button>
-      
-      <form className="mt-3" onSubmit={onSubmitPhoto}>
-          {photo.preview && <div className="mb-2">
-            <label htmlFor="file">
-              <img alt="photo" src={photo.preview} className="w-32" />
-              <p>{photo.name}</p>
-            </label>
-          </div>}
-          <div className="form-group">
-            <input id="file" type="file" className="form-control-file hidden" 
-              name="photo" onChange={onChangePhoto} 
-              accept=".jpg,.gif,.svg,.png" title="" value="" />
-            <label htmlFor="file" className="btn btn-info">Select Photo</label>
+      <div className="grid grid-cols-2">
+        <div>
+          <div>
+            <h2 className="font-bold">Sort</h2>
+            <button className="btn btn-primary" onClick={getOnSortClick('id')}>
+              <span>ID</span> 
+              <ShowSortDir fieldState={sort.sort} field="id" sortDir={sort.dir} />
+            </button>
+            <button className="btn btn-secondary" onClick={getOnSortClick('title')}>
+              <span>Title</span> 
+              <ShowSortDir fieldState={sort.sort} field="title" sortDir={sort.dir} />
+            </button>
+            <button className="btn btn-info" onClick={getOnSortClick('author')}>
+              <span>Author</span>
+              <ShowSortDir fieldState={sort.sort} field="author" sortDir={sort.dir} />
+            </button>
           </div>
-          <input type="submit" value="Upload!" className="btn btn-default" />            
-      </form>
+          
+          {/* daisyUI */}
+          <div className="mt-5">
+            <label htmlFor="post-modal" className="btn btn-primary">
+              Create / Edit
+            </label>
+            <label htmlFor="show-modal" className="btn btn-info" onClick={() => showPost(randomId())}>
+              Show
+            </label>
+            <label htmlFor="delete-modal" className="btn !bg-red-500 border-0" onClick={() => deleteConfirmPost(randomId())}>
+              Delete
+            </label>
+          </div>
+          {/* SwalAlert */}
+          <div className="mt-5">
+            <button className="btn btn-primary" onClick={openCreate}>
+              Create
+            </button>
+            <button className="btn btn-primary" onClick={() => openEdit(randomId())}>
+              Edit
+            </button>
+            <button className="btn btn-info" onClick={() => openShow(randomId())}>
+              Show
+            </button>
+            <button className="btn !bg-red-500 border-0" onClick={() => openDelete(randomId())}>
+              Delete
+            </button>
+          </div>
+          <div>
+            <button className="btn !bg-black text-white border-0" onClick={onLogout}>
+              Logout
+            </button>
+          </div>
+          <button className="btn btn-primary" data-toggle-theme="light,dark" data-act-class="btn-error">
+            change theme
+          </button>
+          
+          <form className="mt-3" onSubmit={onSubmitPhoto}>
+              {photo.preview && <div className="mb-2">
+                <label htmlFor="file">
+                  <img alt="photo" src={photo.preview} className="w-32" />
+                  <p>{photo.name}</p>
+                </label>
+              </div>}
+              <div className="form-group">
+                <input id="file" type="file" className="form-control-file hidden" 
+                  name="photo" onChange={onChangePhoto} 
+                  accept=".jpg,.gif,.svg,.png" title="" value="" />
+                <label htmlFor="file" className="btn btn-info">Select Photo</label>
+              </div>
+              <input type="submit" value="Upload!" className="btn btn-default" />            
+          </form>
+        </div>
+        <div>
+          { list.map(post =>(
+            <div key={post.id} className="card card-side bg-base-100 shadow-xl mb-2">
+              {post.photo && (
+                <figure>
+                  <img src={post.photo} alt="Game" className="w-36 mask mask-square" />
+                </figure>
+              )}
+              <div className="card-body">
+                <h2 className="card-title">{post.title}</h2>
+                <p>{post.author}</p>
+                <div className="card-actions justify-end">
+                  {/*<button className="btn btn-primary">Show</button>
+                   <button className="btn btn-secondary">Edit</button>
+                  <button className="btn btn-error">Delete</button> */}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
 
       <input type="checkbox" id="post-modal" className="modal-toggle" />
       <div className="modal items-center">
