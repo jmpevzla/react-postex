@@ -12,6 +12,9 @@ import { deletePost, getPost, getPosts, logout, upload } from "./api"
 import Post from "./components/Post"
 import PostForm from "./components/PostForm"
 import { themeChange } from 'theme-change'
+import 'lazysizes'
+import 'lazysizes/plugins/attrchange/ls.attrchange';
+
 
 const reactSwal = withReactContent(Swal)
 
@@ -301,6 +304,20 @@ function List() {
     }
   }
 
+  function onTheme(ev: any) {
+    setList(list => {
+      const xlist = [...list]
+      xlist.splice(0, 1)
+      const first = list[0]!
+      xlist.push({
+        ...first,
+        title: 'MODIFIED!',
+        photo: 'http://localhost:4000/uploads/photo-1647904671105-249559290 (copy 11).jpg'
+      })
+      return xlist as any
+    })
+  }
+
   return (
     <div>
       <div className="mb-2">
@@ -365,7 +382,7 @@ function List() {
               Logout
             </button>
           </div>
-          <button className="btn btn-primary" data-toggle-theme="light,dark" data-act-class="btn-error">
+          <button className="btn btn-primary" onClick={onTheme} data-toggle-theme="light,dark" data-act-class="btn-error">
             change theme
           </button>
           
@@ -390,7 +407,9 @@ function List() {
             <div key={post.id} className="card card-side bg-base-100 shadow-xl mb-2">
               {post.photo && (
                 <figure>
-                  <img src={post.photo} alt="Game" className="w-36 mask mask-square" />
+                  <img data-src={post.photo} alt="Game" className="lazyload"
+                    style={{objectFit: "cover", height: '200px', width: '200px'}}
+                     />
                 </figure>
               )}
               <div className="card-body">

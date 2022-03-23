@@ -1,4 +1,4 @@
-export function getRoot(req) {
+function getRoot(req) {
   return `http://${req.connection.localAddress}:${req.connection.localPort}`
 }
 
@@ -11,6 +11,7 @@ function createUrlPosts(req) {
 }
 
 module.exports = {
-    createUrlUsers,
-    createUrlPosts
+  getRoot,
+  createUrlUsers,
+  createUrlPosts
 }
