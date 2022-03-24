@@ -1,8 +1,9 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useContext } from 'react'
 import { useFormik } from 'formik'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import { useLocation } from 'wouter'
+import { setUserAction, userContext } from '@/ContextUser'
 
 interface TLogin {
   email: string,
@@ -10,6 +11,8 @@ interface TLogin {
 }
 
 function Login() {
+  const [user, userDispatch] = useContext(userContext)!
+
   const [, setLoc] = useLocation()
 
   const validate = useCallback((values: TLogin) => {
@@ -33,7 +36,7 @@ function Login() {
     onSubmit: async (values) => {
       try {
         const login = await axios.post('/login', values)
-        
+
         await Swal.fire({
           title: 'Success!',
           icon: 'success',
@@ -45,6 +48,11 @@ function Login() {
           showConfirmButton: false
         })
         
+        userDispatch({
+          type: setUserAction,
+          payload: login.data.user
+        })
+
         try {
           window.localStorage.setItem('postex-token', login.data.token)
           setLoc('/')

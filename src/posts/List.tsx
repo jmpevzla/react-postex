@@ -21,6 +21,8 @@ import {
   QueryClient,
 } from 'react-query'
 import { AxiosResponse } from "axios"
+import { clearUserAction, userContext } from '@/ContextUser'
+import { useContext } from "react"
 
 const reactSwal = withReactContent(Swal)
 
@@ -92,6 +94,8 @@ function List() {
   const [ queryApi, setQueryApi ] = useState({} as Record<string, string>)
   const postsQuery = usePosts(queryApi)
   const postsMut = usePostsMutation(queryClient)
+
+  const [user, userDispatch] = useContext(userContext)!
 
   // async function refetchPosts() {
   //   const query = await postsQuery.refetch()
@@ -283,6 +287,9 @@ function List() {
 
     if(res.ok) {
       window.localStorage.removeItem('postex-token')
+      
+      userDispatch({ type: clearUserAction })
+      
       return setLoc('/login')
     }
     
@@ -422,6 +429,7 @@ function List() {
       </div>
       <div className="grid grid-cols-2">
         <div>
+          <h2>User: { user?.name }</h2>
           <div>
             <h2 className="font-bold">Sort</h2>
             <button className="btn btn-primary" onClick={getOnSortClick('id')}>
