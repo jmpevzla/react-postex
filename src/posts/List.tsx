@@ -3,20 +3,58 @@ import Swal from "sweetalert2"
 import withReactContent from "sweetalert2-react-content"
 import { useLocation } from "wouter"
 import { ShowSortDir } from "@/components/sort"
-import { useQuery } from "@/global/query"
+import { TQuery, useQuery } from "@/global/query"
 import { actionInputSearch, actionGetOnSort, 
   actionInit, useActionGetPostDebounce } from "@/lists/actions"
 import { useSearch } from "@/lists/search"
 import { useSort } from "@/lists/sort"
-import { deletePost, getPost, getPosts, logout, upload } from "./api"
+import { cupdatePost, deletePost, getPost, getPosts, logout, upload } from "./api"
 import Post from "./components/Post"
 import PostForm from "./components/PostForm"
 import { themeChange } from 'theme-change'
 import 'lazysizes'
 import 'lazysizes/plugins/attrchange/ls.attrchange';
-
+import {
+  useQuery as useRQuery,
+  useMutation,
+  useQueryClient,
+  QueryClient,
+} from 'react-query'
+import { AxiosResponse } from "axios"
 
 const reactSwal = withReactContent(Swal)
+
+function usePosts(queryObj: Record<string, string>) {
+  return useRQuery(['posts', queryObj], async () => {
+    const { data } = await getPosts(queryObj) as AxiosResponse
+    const xdata = data.map((value: any) => {
+      return {
+        ...value,
+        photo: value.photo ? 'http://localhost:4000/' + value.photo : null
+      }
+    })
+    return xdata
+  }, {
+    //initialData: [], //in cache
+    placeholderData: [],
+    //staleTime: Infinity,
+    staleTime: 60000, // (1000 = 1s) * 60 = 1m
+    //refetchOnWindowFocus: false,
+    //enabled: false
+  }) 
+}
+
+function usePostsMutation(queryClient: QueryClient) {
+  return useMutation((editTodo: TPost) => {
+    return cupdatePost(editTodo)
+  }, {
+    //retry,
+    //retryDelay,
+    onSuccess: () => {
+      queryClient.invalidateQueries('posts')
+    },
+  })
+}
 
 function List() {
   const [ search, setSearchState ] = useSearch()
@@ -50,22 +88,49 @@ function List() {
     photo: string | null
   }] | []) 
   
+  const queryClient = useQueryClient()
+  const [ queryApi, setQueryApi ] = useState({} as Record<string, string>)
+  const postsQuery = usePosts(queryApi)
+  const postsMut = usePostsMutation(queryClient)
+
+  // async function refetchPosts() {
+  //   const query = await postsQuery.refetch()
+  //   const xdata = query.data.map((value: any) => {
+  //     return {
+  //       ...value,
+  //       photo: value.photo ? 'http://localhost:4000/' + value.photo : null
+  //     }
+  //   })
+  //   setList(xdata)
+  // }
+
+  // async function refetchPosts() {
+  //   const query = await postsQuery.refetch()
+  //   setList(query.data)
+  // }
+
   useEffect(() => {
-    actionInit({
-      setSearch: setSearchState,
-      setSort: setSortState,
-      setQuery: setQueryState
-    })
+    setList(postsQuery.data)
+  }, [postsQuery.data])
+
+  useEffect(() => {
+    // actionInit({
+    //   setSearch: setSearchState,
+    //   setSort: setSortState,
+    //   setQuery: setQueryState
+    // })
 
     async function init() {
-      const res = await getPosts({})
-      const data = res?.data.map((value: any) => {
-        return {
-          ...value,
-          photo: value.photo ? 'http://localhost:4000/' + value.photo : null
-        }
-      })
-      setList(data)
+      // const res = await getPosts({})
+      // const data = res?.data.map((value: any) => {
+      //   return {
+      //     ...value,
+      //     photo: value.photo ? 'http://localhost:4000/' + value.photo : null
+      //   }
+      // })
+      // setList(data)
+      // const query = postsQuery
+      //refetchPosts({})
     }
     init()
 
@@ -124,7 +189,8 @@ function List() {
       return setStPost({
         id: 0,
         title: '',
-        author: ''
+        author: '',
+        photo: null
       })
     }
 
@@ -318,6 +384,28 @@ function List() {
     })
   }
 
+  async function onSearchAll() {
+    setQueryApi({})
+    //await postsQuery.refetch()
+  }
+
+  async function onSearchNeed() {
+    setQueryApi({ q: 'sega' })
+  }
+
+  async function onMutate() {
+    //const res = await postsMut.mutateAsync({
+    postsMut.mutate({
+      "title": "Rush 2049",
+      "author": "Sega Dreamcast",
+      "id": 3,
+      "photo": "uploads/photo-1647904671105-249559290 (copy 2).jpg"
+    })
+    // queryClient.invalidateQueries(['posts'], {
+    //   //exact: true
+    // })
+  }
+
   return (
     <div>
       <div className="mb-2">
@@ -385,6 +473,18 @@ function List() {
           <button className="btn btn-primary" onClick={onTheme} data-toggle-theme="light,dark" data-act-class="btn-error">
             change theme
           </button>
+
+          <div className="flex flex-row mt-4">
+            <button className="btn btn-primary" onClick={onSearchAll}>
+              Search All
+            </button>
+            <button className="btn btn-primary" onClick={onSearchNeed}>
+              Search Sega
+            </button>
+            <button className="btn btn-primary" onClick={onMutate}>
+              Mutate to Sega
+            </button>
+          </div>
           
           <form className="mt-3" onSubmit={onSubmitPhoto}>
               {photo.preview && <div className="mb-2">

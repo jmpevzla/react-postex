@@ -1,7 +1,8 @@
 interface TPost {
   id: number,
   title: string,
-  author: string
+  author: string,
+  photo: string | null
 }
 
 type TPosts = TPost[]
