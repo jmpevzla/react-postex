@@ -1,3 +1,4 @@
+import { isEqual } from "lodash";
 import { createContext, ReactElement, useReducer } from "react";
 
 export interface TUserContext {
@@ -25,6 +26,9 @@ export function UserProvider({ children }: { children: ReactElement }) {
     (state: TUserContext | null, action: TAction<TUserContext>) => {
       switch(action.type) {
         case setUserAction:
+          if (isEqual(state, action.payload!)) {
+            return state
+          } 
           return {...action.payload!}
         case clearUserAction:
           return null

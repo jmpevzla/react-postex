@@ -55,6 +55,7 @@ function Login() {
 
         try {
           window.localStorage.setItem('postex-token', login.data.token)
+          window.localStorage.setItem('postex-user-id', login.data.user.id)
           setLoc('/')
         } catch(err) {
           console.error(err)

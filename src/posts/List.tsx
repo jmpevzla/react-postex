@@ -287,6 +287,7 @@ function List() {
 
     if(res.ok) {
       window.localStorage.removeItem('postex-token')
+      window.localStorage.removeItem('postex-user-id')
       
       userDispatch({ type: clearUserAction })
       

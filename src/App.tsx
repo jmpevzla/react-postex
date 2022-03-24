@@ -3,9 +3,11 @@ import RouteAuth from './components/RouteAuth'
 import Posts from './posts/List'
 import Page404 from './errors/Page404'
 import Page500 from './errors/Page500'
-import AboutMe from './aboutme/AboutMe'
+//import AboutMe from './aboutme/AboutMe'
+import SuspendAbout from './aboutme/SuspendAbout'
 import Login from './auth/Login'
 import Register from './auth/Register'
+import React from 'react'
 
 function App() {
 
@@ -41,7 +43,7 @@ function App() {
         <Switch>
           <Route path="/login" component={Login} />
           <Route path="/register" component={Register} />
-          <RouteAuth path="/about-me" component={AboutMe} />
+          <RouteAuth path="/about-me" component={SuspendAbout} />
           <Route path="/500" component={Page500} />
           <RouteAuth path="/" component={Posts} />
           <Route component={Page404} />
