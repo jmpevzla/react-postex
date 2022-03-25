@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, ChangeEvent } from "react"
+import { useEffect, useState, useRef, ChangeEvent, useCallback } from "react"
 import Swal from "sweetalert2"
 import withReactContent from "sweetalert2-react-content"
 import { useLocation } from "wouter"
@@ -19,6 +19,8 @@ import {
   useMutation,
   useQueryClient,
   QueryClient,
+  useInfiniteQuery,
+  InfiniteData
 } from 'react-query'
 import { AxiosResponse } from "axios"
 import { clearUserAction, userContext } from '@/ContextUser'
@@ -43,6 +45,52 @@ function usePosts(queryObj: Record<string, string>) {
     staleTime: 60000, // (1000 = 1s) * 60 = 1m
     //refetchOnWindowFocus: false,
     //enabled: false
+  }) 
+}
+
+function useInfPosts(queryObj: Record<string, string>) {
+  return useInfiniteQuery(['posts', queryObj], async (params) => {
+    // const add: Record<string, any> = {}
+    
+    // if (queryObj.init) {
+    //   add._page = 1
+    // }
+    
+    const _page = params.pageParam || 1
+    const _limit = 3
+
+    const qo = { ...queryObj, _page, _limit }
+    const response = await getPosts(qo) as AxiosResponse
+    const { data, headers } = response
+    const xdata = data.map((value: any) => {
+      return {
+        ...value,
+        photo: value.photo ? 'http://localhost:4000/' + value.photo : null
+      }
+    })
+
+    const totalCount = headers['x-total-count']
+    const totalPages = Math.ceil(Number(totalCount) / _limit)
+    const nextPage = (_page + 1) > totalPages ? null : _page + 1
+
+    return {
+      data: xdata,
+      nextPage
+    }
+  }, {
+    //initialData: [], //in cache
+    placeholderData: {
+      pages: [],
+      pageParams: [],
+    }, 
+    //staleTime: Infinity,
+    staleTime: 60000, // (1000 = 1s) * 60 = 1m
+    //refetchOnWindowFocus: false,
+    //enabled: false
+    getNextPageParam: (lastPage: any, pages: any[]) => {
+      return lastPage.nextPage
+      //return undefined
+    }
   }) 
 }
 
@@ -91,11 +139,44 @@ function List() {
   }] | []) 
   
   const queryClient = useQueryClient()
-  const [ queryApi, setQueryApi ] = useState({} as Record<string, string>)
-  const postsQuery = usePosts(queryApi)
+  const [ queryApi, setQueryApi ] = useState({
+  } as Record<string, string>)
+  //const postsQuery = usePosts(queryApi)
   const postsMut = usePostsMutation(queryClient)
+  const infPostsQuery = useInfPosts(queryApi)
+
+  const btnLoadMoreRef = useRef<any>(null)
+
+  const callbackIOFn = (entries: IntersectionObserverEntry[]) => {
+    const [ entry ] = entries 
+    //console.log(entries)
+    if (entry.isIntersecting && infPostsQuery.hasNextPage && !infPostsQuery.isFetchingNextPage) {
+      //console.log('fetch more...')
+      infPostsQuery.fetchNextPage()
+    }
+  }
+
+  const optionsIO = {
+    root: null,
+    rootMargin: '0px',
+    threshold: 0.75
+  }
+
+  useEffect(() => {
+
+    const observer = new IntersectionObserver(callbackIOFn, optionsIO)
+    if (btnLoadMoreRef.current) observer.observe(btnLoadMoreRef.current)
+
+    return () => {
+      if (btnLoadMoreRef.current) observer.unobserve(btnLoadMoreRef.current)
+    }
+
+  }, [btnLoadMoreRef, optionsIO])
+
 
   const [user, userDispatch] = useContext(userContext)!
+
+  
 
   // async function refetchPosts() {
   //   const query = await postsQuery.refetch()
@@ -113,9 +194,21 @@ function List() {
   //   setList(query.data)
   // }
 
+  // useEffect(() => {
+  //   setList(postsQuery.data as any)
+  // }, [postsQuery.dataUpdatedAt])
+
   useEffect(() => {
-    setList(postsQuery.data)
-  }, [postsQuery.data])
+    // console.log(infPostsQuery.data)
+    let info: any[] = []
+    for(let xdata of infPostsQuery.data!.pages) {
+      // for(let xinf of xdata.data) {
+      //   info.push(xinf)
+      // }
+      info = info.concat(xdata.data)
+    }
+    setList(info as any)
+  }, [infPostsQuery.dataUpdatedAt])
 
   useEffect(() => {
     // actionInit({
@@ -414,6 +507,17 @@ function List() {
     // })
   }
 
+  async function onLoadMore() {
+    infPostsQuery.fetchNextPage()
+  }
+
+  async function onReload() {
+    //infPostsQuery.refetch()
+    window.scrollTo({ top: 0 })
+    infPostsQuery.remove()
+    infPostsQuery.refetch()
+  }
+
   return (
     <div>
       <div className="mb-2">
@@ -525,13 +629,19 @@ function List() {
                 <h2 className="card-title">{post.title}</h2>
                 <p>{post.author}</p>
                 <div className="card-actions justify-end">
-                  {/*<button className="btn btn-primary">Show</button>
+                  <button className="btn btn-primary">Show</button>
                    <button className="btn btn-secondary">Edit</button>
-                  <button className="btn btn-error">Delete</button> */}
+                  <button className="btn btn-error">Delete</button> 
                 </div>
               </div>
             </div>
           ))}
+          <button className="btn btn-primary" onClick={onLoadMore} ref={btnLoadMoreRef}
+            disabled={!infPostsQuery.hasNextPage || infPostsQuery.isFetchingNextPage}
+            >Load More...</button>
+          <button className="btn btn-secondary" onClick={onReload}
+            disabled={infPostsQuery.isFetching}
+            >Reload...</button>
         </div>
       </div>
 
