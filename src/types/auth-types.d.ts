@@ -1,3 +1,5 @@
+import type { TResponse } from "./api-types"
+
 interface TCredentials {
   email: string,
   password: string

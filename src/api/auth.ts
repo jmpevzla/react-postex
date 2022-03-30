@@ -1,4 +1,6 @@
-import { AxiosResponse } from 'axios'
+import type { AxiosResponse } from 'axios'
+import type { TResponse } from '@/types/api-types'
+import type { TAuthResponse, TCredentials, TSignUp } from '@/types/auth-types'
 import axios, { axiosAuth } from './get-axios'
 
 export async function login(credentials: TCredentials): Promise<TAuthResponse> {
@@ -16,6 +18,8 @@ export async function register(signUp: TSignUp): Promise<TAuthResponse> {
 }
 
 export async function logout() {
-  const res = await axios.post<any, AxiosResponse<TResponse>, never>(`/logout`)
+  const res = await axios.post<any, AxiosResponse<TResponse>, never>
+    (`/logout`)
+  
   return res.data
 }

@@ -1,7 +1,8 @@
+import type { TError } from "@/types/api-types"
 
 export default responseErrorInterceptor
 
-function responseErrorInterceptor(error: any) {
+function responseErrorInterceptor(error: TError) {
   const status: number = error.response?.status || 0
   let msg = ''
   switch(status) {
