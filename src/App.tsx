@@ -1,21 +1,44 @@
 import { useEffect } from "react"
-import { login } from "./api/auth"
+import { useQueryClient } from "react-query"
+import { login } from "@/api/auth"
+import { useLogin, useRegister } from "@/hooks/rq/auth-hooks"
 
 export default App
 
 function App() {
+  const queryClient = useQueryClient()
+  const mutate = useLogin(queryClient)
+  
   useEffect(() => {
     async function init() {
-      const res = await login({
-        email: 'joseperez@postex.io',
-        password: 'admin123'
-      })
-      console.log(res)
+      // const res = await login({
+      //   email: 'joseperez@postex.io',
+      //   password: 'admin1234'
+      // })
+      // console.log(res)
+      //try {
+        mutate.mutate({
+          email: 'joseperezart@postex.com',
+          password: 'alpha123'
+        }, {
+          onSuccess(res) {
+            console.log(res)
+          }
+        })
+        
+      //   console.log('resp: ', resp)
+      // } catch(err) {
+      //   console.log({...err as any})
+      // }
+      
     }
     init()
   }, [])
   
   return (
-    <h1>Hello!</h1>
+    <>
+      <h1>Hello!</h1>
+      {mutate.isError && <p>{(mutate.error as any).message}</p>}
+    </>
   )
 }

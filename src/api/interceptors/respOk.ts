@@ -6,10 +6,7 @@ function responseOkInterceptor(response: AxiosResponse<TResponse>) {
   const info: any = response.data
 
   response.data = {
-    info,
-    ok: true,
-    msgError: '',
-    err: null
+    info
   }
 
   return response

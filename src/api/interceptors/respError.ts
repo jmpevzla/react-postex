@@ -2,14 +2,23 @@
 export default responseErrorInterceptor
 
 function responseErrorInterceptor(error: any) {
-  const res: TResponse = {
-    info: null,
-    ok: false,
-    msgError: error.message,
-    err: error
+  const status: number = error.response?.status || 0
+  let msg = ''
+  switch(status) {
+    case 400:
+      msg = 'Oops, Bad Request!' 
+      break
+    case 401:
+      msg = 'Oops, You are Unauthorizated!'
+      break
+    case 500:
+      msg = 'Sorry! Server Error!, please try again later'
+      break
+    default:
+      msg = error.message
   }
-  
-  return {
-    data: res
-  }
+
+  error.status = status
+  error.message = msg
+  throw error
 }
