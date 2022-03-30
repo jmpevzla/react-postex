@@ -6,7 +6,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "start": "json-server --watch db.json --routes routes.json --port 4000 --static ./public --middlewares ./middlewares/loginMiddleware ./middlewares/registerMiddleware ./middlewares/authMiddleware.js ./middlewares/uploadMiddleware.js",
+    "start": "json-server --watch db.json --routes routes.json --port 4000 --static ./public --middlewares ./middlewares/loginMiddleware ./middlewares/registerMiddleware ./middlewares/checkEmailMiddleware.js ./middlewares/authMiddleware.js ./middlewares/uploadMiddleware.js",
     "js": "json-server --watch db.js --routes routes.json --port 4000 --static ./public --middlewares ./middlewares/middleware.js",
     "chalet-start": "chalet add 'npm start' -p 4000 && chalet start",
     "chalet-stop": "chalet stop",
