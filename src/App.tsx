@@ -1,6 +1,5 @@
 import { useEffect } from "react"
 import { useQueryClient } from "react-query"
-import { login } from "@/api/auth"
 import { useLogin, useRegister } from "@/hooks/rq/auth-hooks"
 
 export default App
@@ -19,7 +18,7 @@ function App() {
       //try {
         mutate.mutate({
           email: 'joseperezart@postex.com',
-          password: 'alpha123'
+          password: 'alpha1234'
         }, {
           onSuccess(res) {
             console.log(res)

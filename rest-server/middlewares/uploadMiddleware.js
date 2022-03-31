@@ -54,15 +54,15 @@ module.exports = [upload.single('photo'), async (req, res, next) => {
           photo
         })
         
-        return res.json({ id, photo, ok: true, error: '' })
+        return res.json({ id, photo })
       } catch(err) {
         console.error(err)
         fs.unlinkSync(req.file.path)
-        return res.json({ id, photo: null, ok: false, error: err.message })
+        return res.status(500).json({ error: err.message })
       }
     } 
 
-    return res.json({ id, photo: null, ok: false, error: 'The file can not be processed, please verify the file and try again.' })
+    return res.status(400).json({ error: 'The file can not be processed, please verify the file and try again.' })
   }
   next()
 }]
