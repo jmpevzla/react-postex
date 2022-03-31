@@ -1,7 +1,8 @@
 const Axios = require('axios').default
 const fs = require('fs')
 const multer  = require('multer')
-const { createUrlPosts, getRoot } = require('./utils')
+const express = require('express')
+const { createUrlPosts } = require('../utils')
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -35,12 +36,18 @@ const axios = Axios.create({
   }
 })
 
-module.exports = [upload.single('photo'), async (req, res, next) => {
-  if (req.path.includes('/posts/upload') && req.method === 'POST') {
-    const split = req.path.split('/')
-    const id = Number(split.pop())
+module.exports = [upload.single('photo'),
+  /**
+   * 
+   * @param {express.Request} req 
+   * @param {express.Response} res 
+   * @returns 
+   */
+  async (req, res) => {
+    const id = Number(req.params.id)
+    
     if (isNaN(id) || id < 1) {
-      return next()
+      return res.status(400).json({ error: 'id is invalid' })
     }
     const photo = (req.file?.path || '').replace('public/', '')
     
@@ -63,6 +70,5 @@ module.exports = [upload.single('photo'), async (req, res, next) => {
     } 
 
     return res.status(400).json({ error: 'The file can not be processed, please verify the file and try again.' })
-  }
-  next()
+  
 }]
