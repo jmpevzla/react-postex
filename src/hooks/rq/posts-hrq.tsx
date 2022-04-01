@@ -1,3 +1,4 @@
+import { useMemo } from "react"
 import { useQuery, useInfiniteQuery, QueryFunctionContext
   , QueryKey, useMutation, QueryClient} from "react-query"
 
@@ -14,8 +15,7 @@ import InfQueryBuilder from "./builders/infQueryBuilder-hrq"
 export function useInfPosts(query: TQuery) {
   return useInfiniteQuery<TPostsInf, TError>
     ([postsKey, query], async (params: QueryFunctionContext<QueryKey, number>) => {
-
-      const infQueryBuilder = new InfQueryBuilder<TPosts>()
+      const infQueryBuilder = useMemo(() => new InfQueryBuilder<TPosts>(), [])
 
       const qo = infQueryBuilder
         .setInfPage(params)
