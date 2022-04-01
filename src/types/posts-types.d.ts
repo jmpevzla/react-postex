@@ -1,4 +1,4 @@
-import type { TResponse } from "./api-types"
+import type { TResponse, TTotalResponse } from "./api-types"
 
 interface TPost {
   id: number,
@@ -11,9 +11,7 @@ type TPosts = TPost[]
 
 type TPostResponse = TResponse<TPost>
 type TPostsResponse = TResponse<TPosts>
-interface TPostsTotalResponse extends TPostsResponse {
-  total: number
-}
+type TPostsTotalResponse = TTotalResponse<TPosts>
 
 interface TPostsInf {
   data: TPosts,

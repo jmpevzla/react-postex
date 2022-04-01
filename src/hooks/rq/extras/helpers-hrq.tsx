@@ -35,3 +35,7 @@ export function getInfTotalPages(total: number, limit: number) {
 export function getInfNextPage(page: number, totalPages: number): number | null {
   return (page + 1) > totalPages ? null : page + 1
 }
+
+export function throwErrorCalled(method: string) {
+  throw new Error(`${method} has not been called`);
+}

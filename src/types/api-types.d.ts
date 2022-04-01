@@ -13,6 +13,10 @@ interface TResponse<T = any> {
   info: T | null
 }
 
+interface TTotalResponse<T = any> extends TResponse<T> {
+  total: number
+}
+
 interface TError extends AxiosError {
   status: number
 }

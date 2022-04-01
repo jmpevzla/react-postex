@@ -2,27 +2,33 @@ import { useQuery, useInfiniteQuery, QueryFunctionContext
   , QueryKey, useMutation, QueryClient} from "react-query"
 
 import { TError, TQuery } from "@/types/api-types"
-import { TPhotoPost, TPhotoPostMutation, TPost, TPostsInf } from "@/types/posts-types"
-import { cupdatePost, deletePost, getPost, getPosts, uploadPhotoPost } from "@/api/posts-api"
-import { infPlaceholder, postKey, postsKey, staleTime } from "./extras/config-hrq"
-
-import { getInfLimit, getInfNextPage, getInfPage
-  , getInfQuery, getInfTotalPages, onSuccessPostsFunc } from "./extras/helpers-hrq"
+import { TPhotoPost, TPhotoPostMutation
+  , TPost, TPostsInf, TPosts } from "@/types/posts-types"
+import { cupdatePost, deletePost
+  , getPost, getPosts, uploadPhotoPost } from "@/api/posts-api"
+import { infPlaceholder, postKey
+  , postsKey, staleTime } from "./extras/config-hrq"
+import { onSuccessPostsFunc } from "./extras/helpers-hrq"
+import InfQueryBuilder from "./builders/infQueryBuilder-hrq"
 
 export function useInfPosts(query: TQuery) {
   return useInfiniteQuery<TPostsInf, TError>
     ([postsKey, query], async (params: QueryFunctionContext<QueryKey, number>) => {
-      
-      const page = getInfPage(params)
-      const limit = getInfLimit()
 
-      const qo = getInfQuery(query, page, limit)
+      const infQueryBuilder = new InfQueryBuilder<TPosts>()
+
+      const qo = infQueryBuilder
+        .setInfPage(params)
+        .setInfLimit()
+        .setInfQueryParams(query)
+        .getInfQueryParams()
+      
       const response = await getPosts(qo)
 
-      return {
-        data: response.info!,
-        nextPage: getInfNextPage(page, getInfTotalPages(response.total, limit))
-      }
+      return infQueryBuilder
+        .setInfResponse(response)
+        .setNextPage()
+        .getReturn()
   }, {
     placeholderData: infPlaceholder,
     staleTime: staleTime,

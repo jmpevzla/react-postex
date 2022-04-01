@@ -1,6 +1,6 @@
 import { useEffect } from "react"
 import { useQueryClient } from "react-query"
-import { useLogin, useRegister } from "@/hooks/rq/auth-hooks"
+import { useLogin, useRegister } from "@/hooks/rq/auth-hrq"
 
 export default App
 
