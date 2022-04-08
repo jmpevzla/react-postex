@@ -1,6 +1,7 @@
 import type { AxiosResponse } from 'axios'
 import type { TCheckResponse, TResponse } from '@/types/api-types'
-import type { TAuthResponse, TCredentials, TSignUp } from '@/types/auth-types'
+import type { TAuthResponse, TCredentials
+  , TSignUp, TUserResponse } from '@/types/auth-types'
 import axios, { axiosAuth } from './extras/get-axios'
 
 export async function login(credentials: TCredentials): Promise<TAuthResponse> {
@@ -31,6 +32,13 @@ export async function checkEmail(email: string): Promise<TCheckResponse> {
 export async function logout() {
   const res = await axios.post<any, AxiosResponse<TResponse>>
     (`/logout`)
+  
+  return res.data
+}
+
+export async function getUser(id: number): Promise<TUserResponse> {
+  const res = await axios.get<any, AxiosResponse<TUserResponse>>
+    (`/users/${id}`)
   
   return res.data
 }

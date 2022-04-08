@@ -1,9 +1,10 @@
+import { getStToken } from "@/extras/storage-extras"
 import type { AxiosRequestConfig } from "axios"
 
 export default reqAuthInterceptor
 
 function reqAuthInterceptor(config: AxiosRequestConfig) {
-  const token = window.localStorage.getItem('postex-token')
+  const token = getStToken()
 
   if (token) {
     config.headers = {

@@ -1,7 +1,9 @@
 import { QueryClient, useMutation, useQuery } from "react-query";
-import { checkEmail, login, logout, register } from "@/api/auth-api";
+import { checkEmail, getUser, login
+  , logout, register } from "@/api/auth-api";
 import type { TError, TCheckData } from "@/types/api-types";
-import type { TAuthData, TCredentials, TSignUp } from "@/types/auth-types";
+import type { TAuthData, TCredentials
+  , TSignUp, TUser } from "@/types/auth-types";
 import { onSuccessFunc } from "./extras/helpers-hrq";
 
 export function useLogin(queryClient: QueryClient) {
@@ -40,5 +42,15 @@ export function useLogout(queryClient: QueryClient) {
       await logout()
   }, {
     onSuccess: onSuccessFunc(queryClient)
+  })
+}
+
+export function useUser(id: number) {
+  return useQuery<TUser, TError>
+    (['user', id], async () => {
+      const { info } = await getUser(id)
+      return info!
+  }, {
+    enabled: false
   })
 }

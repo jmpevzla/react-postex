@@ -11,6 +11,7 @@ interface TUser {
   email: string
 }
 
+type TUserResponse = TResponse<TUser>
 interface TAuthData {
   message: string,
   token: string,
