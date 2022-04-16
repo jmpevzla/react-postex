@@ -14,6 +14,7 @@ function App() {
         <Route path="/login" component={SLogin} />
         <Route path="/register" component={SRegister} />
         <RouteAuth path="/" component={SHome} />
+        <RouteAuth path="/about" component={SHome} />
         <Route component={SNotfound} /> 
       </Switch>
     </Router>

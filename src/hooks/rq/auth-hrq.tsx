@@ -51,6 +51,12 @@ export function useUser(id: number) {
       const { info } = await getUser(id)
       return info!
   }, {
-    enabled: false
+    enabled: false,
+    retry: (failureCount, error) => {
+      if (error.status === 401 || failureCount > 2) {
+        return false
+      }
+      return true
+    }
   })
 }

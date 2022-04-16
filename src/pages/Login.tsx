@@ -1,38 +1,39 @@
-import { useCallback, useContext
-  , useEffect, useState } from 'react'
-import { Link, useLocation } from 'wouter'
-import { useFormik } from 'formik'
-import { useQueryClient } from 'react-query'
-import Swal from 'sweetalert2'
-import { setUserAction, userContext } from '@/contexts/userContext'
-import type { TCredentials } from '@/types/auth-types'
-import { setStUser, stOkLogin } from '@/extras/storage-extras'
-import { useLogin } from '@/hooks/rq/auth-hrq'
+import { useCallback, useContext, useEffect, useState } from "react";
+import { Link, useLocation } from "wouter";
+import { useFormik } from "formik";
+import { useQueryClient } from "react-query";
+import Swal from "sweetalert2";
+import { setUserAction, userContext } from "@/contexts/userContext";
+import type { TCredentials } from "@/types/auth-types";
+import { setStUser, stOkLogin } from "@/extras/storage-extras";
+import { useLogin } from "@/hooks/rq/auth-hrq";
+import MainLayout from "@/pages/layout/MainLayout";
+import AuthLayout from "./layout/AuthLayout";
 
-export default Login
+export default Login;
 
 function Login() {
-  const [, userDispatch] = useContext(userContext)!
-  const [, setLocation] = useLocation()
-  const [show, setShow] = useState(false)
-  const queryClient = useQueryClient()
-  const login = useLogin(queryClient)
+  const [, userDispatch] = useContext(userContext)!;
+  const [, setLocation] = useLocation();
+  const [show, setShow] = useState(false);
+  const queryClient = useQueryClient();
+  const login = useLogin(queryClient);
 
   const validate = useCallback((values: TCredentials) => {
-    const errors: Record<string, string> = {} 
+    const errors: Record<string, string> = {};
     if (!values.email) {
-      errors.email = 'Required'
+      errors.email = "Required";
     }
     if (!values.password) {
-      errors.password = 'Required'
+      errors.password = "Required";
     }
-    return errors
-  }, [])
+    return errors;
+  }, []);
 
   const formFormik = useFormik<TCredentials>({
     initialValues: {
-      email: '',
-      password: ''
+      email: "",
+      password: "",
     },
     validate,
     validateOnChange: false,
@@ -40,82 +41,114 @@ function Login() {
       login.mutate(values, {
         onSuccess: async (data) => {
           await Swal.fire({
-            title: 'Success!',
-            icon: 'success',
+            title: "Success!",
+            icon: "success",
             text: data.message,
             toast: true,
             timerProgressBar: true,
-            timer: 2000,
-            position: 'top',
-            showConfirmButton: false
-          })
+            timer: 1000,
+            position: "top",
+            showConfirmButton: false,
+          });
 
           userDispatch({
             type: setUserAction,
-            payload: data.user
-          })
+            payload: data.user,
+          });
 
-          setStUser(data.token, data.user.id)
-          setLocation('/')
+          setStUser(data.token, data.user.id);
+          setLocation("/");
         },
         onError: (error) => {
           if (error.status === 401) {
-            error.message = 'Credentials invalid!, try again'
+            error.message = "Credentials invalid!, try again";
           }
-        }
-      })
-    }
-  })
+        },
+      });
+    },
+  });
 
   useEffect(() => {
     if (stOkLogin()) {
-      return setLocation('/')
+      return setLocation("/");
     }
-    setShow(true)
-  }, [])
+    setShow(true);
+  }, []);
 
   if (show) {
     return (
-      <div>
-        <h1>Login</h1>
+      <MainLayout bg="bg-violet-200">
+        <AuthLayout>
+          <div className="my-10 mx-4">
+            <header>
+              <p className="text-xl">Hello !</p>
+              <p className="text-violet-600 font-bold text-2xl">
+                Welcome to Postex.io
+              </p>
+              <h1 className="text-center text-lg mt-4">
+                <span className="text-violet-700">Login</span> Your Account
+              </h1>
+            </header>
 
-        {login.error && (<p>{login.error.message}</p>)}
-        
-        <form onSubmit={formFormik.handleSubmit}>
-          <div>
-            <label htmlFor="email">Email</label>
-            <input id="email" type="email" name="email"  
-              value={formFormik.values.email} 
-              onChange={formFormik.handleChange} 
-            />
-            {formFormik.errors.email && 
-              <p className="text-error font-bold w-50">{formFormik.errors.email}</p>}
+            <form className="mx-8" onSubmit={formFormik.handleSubmit}>
+              <div className="my-3">
+                <input
+                  id="email"
+                  type="email"
+                  name="email"
+                  className="border-blue-600 w-full p-2 form-control input tracking-wider"
+                  placeholder="Email Address"
+                  value={formFormik.values.email}
+                  onChange={formFormik.handleChange}
+                />
+                {formFormik.errors.email && (
+                  <p className="text-error text-sm font-bold w-50">
+                    *{formFormik.errors.email}
+                  </p>
+                )}
+              </div>
+
+              <div className="my-3">
+                <input
+                  id="password"
+                  type="password"
+                  name="password"
+                  className="border-blue-600 w-full p-2 form-control input tracking-wider"
+                  placeholder="Password"
+                  value={formFormik.values.password}
+                  onChange={formFormik.handleChange}
+                />
+                {formFormik.errors.password && (
+                  <p className="text-error text-sm font-bold w-50">
+                    *{formFormik.errors.password}
+                  </p>
+                )}
+              </div>
+
+              <div className="my-3">
+                <div className="min-h-8">
+                  {login.error && (
+                    <p className="text-error text-center">
+                      {login.error.message}
+                    </p>
+                  )}
+                </div>
+
+                <button type="submit" className="w-full btn btn-primary">
+                  Login
+                </button>
+              </div>
+            </form>
+
+            <div className="text-center">
+              <Link href="/register">
+                <a className="link !no-underline">Create Account</a>
+              </Link>
+            </div>
           </div>
-
-          <div>
-            <label htmlFor="password">Password</label>
-            <input id="password" type="password" name="password" 
-              value={formFormik.values.password} 
-              onChange={formFormik.handleChange}   
-            />
-            {formFormik.errors.password && 
-              <p className="text-error font-bold w-50">{formFormik.errors.password}</p>}
-          </div>
-
-          <div>
-            <button type="submit">Login</button>
-          </div>
-
-          
-        </form>
-
-        <div>
-          <Link href="/register">
-            <a className="link">register</a>
-          </Link>
-        </div> 
-      </div>
-    )
+        </AuthLayout>
+      </MainLayout>
+    );
   }
-  return null
+  return null;
 }
