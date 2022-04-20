@@ -77,7 +77,7 @@ function Login() {
 
   if (show) {
     return (
-      <MainLayout bg="bg-violet-200">
+      <MainLayout>
         <AuthLayout>
           <div className="my-10 mx-4">
             <header>

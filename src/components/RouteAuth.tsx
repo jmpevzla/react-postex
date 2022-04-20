@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react"
-import { Route, RouteProps } from "wouter"
+import { Route, RouteProps, useLocation } from "wouter"
 import { isEqual } from "lodash"
 import { useQueryClient } from "react-query"
 import { clearUserAction, setUserAction, userContext } from "@/contexts/userContext"
@@ -9,6 +9,7 @@ import { getStUserId
   , clearStUser, stOkLogin } from "@/extras/storage-extras"
 import { useUser } from "@/hooks/rq/auth-hrq"
 import SPageError from "@/suspensePages/SPageError"
+import Login from "@/pages/Login"
 
 export default RouteAuth
 
@@ -20,6 +21,7 @@ function RouteAuth(props: RouteProps) {
   const userId = getStUserId()
   const [user, userDispatch] = useContext(userContext)!
   const [auth, setAuth] = useState('')
+  const [, setLocation] = useLocation()
   const userApi = useUser(Number(userId))
 
   function hasUser() {
@@ -45,18 +47,18 @@ function RouteAuth(props: RouteProps) {
   useEffect(() => {
 
     if (hasUser()) {
-      setAuth(LOGGED)
-      return
+      return setAuth(LOGGED)
     }
 
     if (isError401()) {
-      setAuth(UNAUTHORIZATED)
-      return
+      if (props.path === '/') {
+        return setLocation('/login')
+      }
+      return setAuth(UNAUTHORIZATED)
     }
 
     if (isError()) {
-      setAuth(ERROR)
-      return
+      return setAuth(ERROR)
     }
 
     if (hasUserData()) {
@@ -65,8 +67,7 @@ function RouteAuth(props: RouteProps) {
         payload: userApi.data
       })
       userApi.remove()
-      setAuth(LOGGED)
-      return
+      return setAuth(LOGGED)
     }
 
     if (noUserData()) {

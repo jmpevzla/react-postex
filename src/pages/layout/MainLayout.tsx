@@ -7,7 +7,7 @@ import ToggleTheme from '@/components/ToggleTheme'
 
 export default MainLayout
 
-function MainLayout({ children, bg = '' }: 
+function MainLayout({ children, bg = 'bg-violet-200' }: 
   { children: React.ReactNode, bg?: string }) {
   const drawerToggle = useRef<HTMLInputElement>(null)
   
