@@ -13,10 +13,10 @@ import { onSuccessPostsFunc } from "./extras/helpers-hrq"
 import InfQueryBuilder from "./builders/infQueryBuilder-hrq"
 
 export function useInfPosts(query: TQuery) {
+  const infQueryBuilder = useMemo(() => new InfQueryBuilder<TPosts>(), [])
+
   return useInfiniteQuery<TPostsInf, TError>
     ([postsKey, query], async (params: QueryFunctionContext<QueryKey, number>) => {
-      const infQueryBuilder = useMemo(() => new InfQueryBuilder<TPosts>(), [])
-
       const qo = infQueryBuilder
         .setInfPage(params)
         .setInfLimit()
@@ -24,7 +24,7 @@ export function useInfPosts(query: TQuery) {
         .getInfQueryParams()
       
       const response = await getPosts(qo)
-
+      
       return infQueryBuilder
         .setInfResponse(response)
         .setNextPage()
