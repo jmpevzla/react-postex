@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react"
 import Swal from "sweetalert2"
 import withReactContent from "sweetalert2-react-content"
-import { mdiPencil, mdiTrashCan, mdiPlus
-  , mdiEye } from "@mdi/js"
+import { mdiPencil, mdiTrashCan
+  , mdiPlus, mdiSort } from "@mdi/js"
 import { Icon } from "@mdi/react"
 import MainLayout from "./layout/MainLayout"
 import PostForm from "@/components/PostForm"
@@ -16,58 +16,58 @@ import { useSearch } from "@/hooks/lists/useSearch"
 import { useInfPosts } from "@/hooks/rq/posts-hrq"
 import { useQueryBar } from "@/hooks/lists/useQueryBar"
 import { useDebounce } from "@/hooks/useDebouce"
+import SortItem from "@/components/SortItem"
+import { useSort } from "@/hooks/lists/useSort"
+import { getApiQuerySort, getQueryUrlSort
+  , TSort, TSortOpts } from "@/code/lists/sort"
+import { TPost } from "@/types/posts-types"
 
 export default Home
 
 const reactSwal = withReactContent(Swal)
 
-type TPost = any
+//type TPost = any
 interface TPrepareGetPostsParams {
   xstateSearch?: TSearch,
   xsearch?: TSearchOpts,
-  xstateSort?: any, //TSort,
-  xsort?: any //TSortOpts
+  xstateSort?: TSort,
+  xsort?: TSortOpts
 }
 
 function Home() {
-  const [ query, setQueryState ] = useQueryBar([
+  const [ queryBar, setQueryBar ] = useQueryBar([
     ['q', ''],
     ['sort', ''],
     ['order', '']
   ])
-  const [search, setSearch] = useSearch()
-  //const [search, setSearch] = useSearch()
-  const [queryApi, setQueryApi] = useState<Record<string, string>>({})
+  const [ search, setSearch ] = useSearch()
+  const [ sort, setSort ] = useSort()
+  const [ queryApi, setQueryApi ] = useState<Record<string, string>>({})
   const infPostsQuery = useInfPosts(queryApi)
 
   function prepareGetPost({ xstateSearch, xsearch, xstateSort, xsort }: TPrepareGetPostsParams) {
     const searchQuery = getApiQuerySearch(xsearch, xstateSearch)
-    //const sortQuery = getApiQuerySort(xsort, xstateSort)
-    const query = createApiQueryObject(searchQuery, {}) //sortQuery)
+    const sortQuery = getApiQuerySort(xsort, xstateSort, 'title')
+    const query = createApiQueryObject(searchQuery, sortQuery)
     setQueryApi(query)
   }
   const prepareGetPostDeb = useDebounce(prepareGetPost)
   
   useEffect(() => {
-    let paramsSearch : TSearchOpts = getQueryUrlSearch()
+    let paramsSearch: TSearchOpts = getQueryUrlSearch()
     setSearch(paramsSearch)
 
-  // let paramsSort : TSortOpts = getQueryUrlSort()
-  // setSort(paramsSort)
-  // if (setSort) {
-  //   setSort(paramsSort)
-  // } else {
-  //   paramsSort = undefined
-  // }
-
-    // setQuery({
-    //   ...paramsSearch,
-    //   ...paramsSort
-    // })
-
+    let paramsSort: TSortOpts = getQueryUrlSort()
+    setSort(paramsSort)
+    
+    setQueryBar({
+      ...paramsSearch,
+      ...paramsSort
+    })
+    
     prepareGetPost({
       xsearch: paramsSearch,
-      //xsort: paramsSort
+      xsort: paramsSort
     })  
   }, [])
 
@@ -107,7 +107,7 @@ function Home() {
 
   async function openShow(id: number) {
     
-    const res = { data: { id, title: 'TEST', author: 'TEST' } }//await getPost(id)
+    const res = { data: { id, title: 'TEST', author: 'TEST', photo: '' } }//await getPost(id)
     const post: TPost = res?.data 
 
     await reactSwal.fire({
@@ -120,16 +120,30 @@ function Home() {
     })
   }
 
-  async function onInputSearch(ev: React.FormEvent<HTMLInputElement>) {
+  function onInputSearch(ev: React.FormEvent<HTMLInputElement>) {
     const q = getInputEventValue(ev)
     setSearch({ q })
     
-    const xquery = getMixQuery({ q }, query.current)
+    const xquery = getMixQuery({ q }, queryBar.current)
     setParamsToQueryBar(xquery)
-    
+    setQueryBar({ q })
+
     prepareGetPostDeb({
       xsearch: { q },
-      //xstateSort: sort
+      xstateSort: sort
+    })
+  }
+
+  function changeSort(newSort: TSort) {
+    setSort(newSort)
+
+    const xquery = getMixQuery(newSort, queryBar.current)
+    setParamsToQueryBar(xquery)
+    setQueryBar(newSort)
+
+    prepareGetPostDeb({
+      xstateSearch: search,
+      xsort: newSort
     })
   }
 
@@ -137,7 +151,7 @@ function Home() {
     <MainLayout>
       <div className="lg:mx-28">
         <div className="mb-3">
-          <div className="lg:mx-36">
+          <div className="lg:mx-36 flex flex-row">
             <input type="search" 
               placeholder="Search..." 
               value={search.q}
@@ -149,18 +163,43 @@ function Home() {
                 w-full
               " 
             />
+            <div className="dropdown dropdown-end">
+              <label tabIndex={0} className="btn m-1">
+                <Icon path={mdiSort} size={1} />
+              </label>
+              <ul tabIndex={0} 
+                  className="
+                    dropdown-content menu p-2 
+                    shadow bg-base-200 rounded-box 
+                    w-52
+                  ">
+                <li><SortItem 
+                  caption="ID" field="id" 
+                  sort={sort} 
+                  onChangeSort={changeSort} /></li>
+                <li><SortItem caption="Title" field="title" 
+                  sort={sort} 
+                  onChangeSort={changeSort} /></li>
+                <li><SortItem caption="Author" field="author" 
+                  sort={sort} 
+                  onChangeSort={changeSort} /></li>
+              </ul>
+            </div>
+
           </div>
         </div>
 
-        <div className={`h-[calc(100vh_-_8.15rem)] pr-5 overflow-y-scroll`}>
+        <div className={`h-[calc(100vh_-_8.50rem)] pr-5 overflow-y-scroll`}>
           {infPostsQuery.data?.pages.map(page => {
+            
             return page.data.map(post => (
               <div className="mb-2" key={post.id} onClick={() => openShow(post.id)}>
                 <div className="card card-side bg-base-100 shadow-xl">
-                  <figure><img src="https://api.lorem.space/image/movie?w=150&h=210" alt="Movie" /></figure>
+                  <figure><img src={post.photo} alt="Post" 
+                    className="w-[210px] h-[210px]"  /></figure>
                   <div className="card-body">
-                    <h2 className="card-title">New post!</h2>
-                    <p>Author</p>
+                    <h2 className="card-title">{ post.title }</h2>
+                    <p>{ post.author }</p>
                     <div className="card-actions justify-end">
                       {/* <button className="btn btn-accent">
                         <Icon path={mdiEye} size={1} />

@@ -5,15 +5,20 @@ import { TPostsResponse, TPostResponse, TPost,
   TPostCreate, TPhotoPostResponse, TPostsTotalResponse } from '@/types/posts-types'
 import axios, { axiosUpload } from './extras/get-axios'
 import { getTotalCount } from './extras/utils-api'
+import { preparePhoto } from '@/code/entities/post'
 
 export async function getPosts(query: TQuery): Promise<TPostsTotalResponse> {
   const res = await axios.get<any, AxiosResponse<TPostsResponse>>
     (`/posts`, {
       params: query
     })
-  
+
+  const info = res.data.info?.map(value => {
+    return preparePhoto(value)
+  }) || null
+
   return {
-    info: res.data.info,
+    info: info,
     total: getTotalCount(res.headers)
   }
 }
@@ -22,7 +27,11 @@ export async function getPost(id: number): Promise<TPostResponse> {
   const res = await axios.get<any, AxiosResponse<TPostResponse>>
     (`/posts/${id}`)
   
-  return res.data
+  const data = {
+    info: res.data.info ? preparePhoto(res.data.info) : null
+  }
+
+  return data
 }
 
 export async function deletePost(id: number): Promise<TPostResponse> {
