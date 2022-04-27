@@ -51,6 +51,7 @@ function RouteAuth(props: RouteProps) {
     }
 
     if (isError401()) {
+      clearStUser()
       if (props.path === '/') {
         return setLocation('/login')
       }
