@@ -12,7 +12,7 @@ import { infPlaceholder, postKey
 import { onSuccessPostsFunc } from "./extras/helpers-hrq"
 import InfQueryBuilder from "./builders/infQueryBuilder-hrq"
 
-export function useInfPosts(query: TQuery) {
+export function useInfPosts(query: TQuery, enabled: boolean) {
   const infQueryBuilder = useMemo(() => new InfQueryBuilder<TPosts>(), [])
 
   return useInfiniteQuery<TPostsInf, TError>
@@ -32,6 +32,7 @@ export function useInfPosts(query: TQuery) {
   }, {
     placeholderData: infPlaceholder,
     staleTime: staleTime,
+    enabled,
     getNextPageParam: (lastPage: TPostsInf, _pages: TPostsInf[]) => {
       return lastPage.nextPage
     }

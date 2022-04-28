@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import Swal from "sweetalert2"
 import withReactContent from "sweetalert2-react-content"
 import { mdiPencil, mdiTrashCan
@@ -22,12 +22,13 @@ import { getApiQuerySort, getQueryUrlSort
   , TSort, TSortOpts } from "@/code/lists/sort"
 import { TPost } from "@/types/posts-types"
 import PostPhoto from "@/components/PostPhoto";
+import useInsObs from "@/hooks/useInsObs"
+import LoadingComp from "@/components/LoadingComp"
 
 export default Home
 
 const reactSwal = withReactContent(Swal)
 
-//type TPost = any
 interface TPrepareGetPostsParams {
   xstateSearch?: TSearch,
   xsearch?: TSearchOpts,
@@ -44,8 +45,9 @@ function Home() {
   const [ search, setSearch ] = useSearch()
   const [ sort, setSort ] = useSort()
   const [ queryApi, setQueryApi ] = useState<Record<string, string>>({})
-  const infPostsQuery = useInfPosts(queryApi)
-
+  const enabledInfQueryRef = useRef(false)
+  const infPostsQuery = useInfPosts(queryApi, enabledInfQueryRef.current)
+  
   function prepareGetPost({ xstateSearch, xsearch, xstateSort, xsort }: TPrepareGetPostsParams) {
     const searchQuery = getApiQuerySearch(xsearch, xstateSearch)
     const sortQuery = getApiQuerySort(xsort, xstateSort, 'title')
@@ -54,6 +56,14 @@ function Home() {
   }
   const prepareGetPostDeb = useDebounce(prepareGetPost)
   
+  function onInsObsEvent(entries: IntersectionObserverEntry[]) {
+    const [ entry ] = entries
+    if (entry.isIntersecting && infPostsQuery.hasNextPage && !infPostsQuery.isFetchingNextPage) {
+      infPostsQuery.fetchNextPage()
+    }
+  }
+  const loadMoreRef = useInsObs(onInsObsEvent, infPostsQuery.dataUpdatedAt)
+
   useEffect(() => {
     let paramsSearch: TSearchOpts = getQueryUrlSearch()
     setSearch(paramsSearch)
@@ -65,11 +75,13 @@ function Home() {
       ...paramsSearch,
       ...paramsSort
     })
+
+    enabledInfQueryRef.current = true
     
-    prepareGetPost({
-      xsearch: paramsSearch,
-      xsort: paramsSort
-    })  
+    // prepareGetPost({
+    //   xsearch: paramsSearch,
+    //   xsort: paramsSort
+    // })  
   }, [])
 
   function showPostForm({ post = null }: { post?: TPost | null } = {}) {
@@ -214,8 +226,11 @@ function Home() {
                   </div>
                 </div>
               </div>
-            ))  
-          })}    
+            ))
+
+          })}
+          <div ref={loadMoreRef} className="h-3" />
+          {infPostsQuery.isFetching && <LoadingComp />}
         </div>
 
         <div className="fixed bottom-4 right-8">
