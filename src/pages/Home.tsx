@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react"
 import Swal from "sweetalert2"
 import withReactContent from "sweetalert2-react-content"
-import 'lazysizes'
-import 'lazysizes/plugins/attrchange/ls.attrchange';
 import { mdiPencil, mdiTrashCan
   , mdiPlus, mdiSort } from "@mdi/js"
 import { Icon } from "@mdi/react"
@@ -23,7 +21,7 @@ import { useSort } from "@/hooks/lists/useSort"
 import { getApiQuerySort, getQueryUrlSort
   , TSort, TSortOpts } from "@/code/lists/sort"
 import { TPost } from "@/types/posts-types"
-import noPhotoImage from "@/assets/no-photo.jpg"
+import PostPhoto from "@/components/PostPhoto";
 
 export default Home
 
@@ -198,11 +196,7 @@ function Home() {
             return page.data.map(post => (
               <div className="mb-2" key={post.id} onClick={() => openShow(post.id)}>
                 <div className="card card-side bg-base-100 shadow-xl">
-                  <figure>
-                    <img src={post.photo ? post.photo : noPhotoImage} 
-                      alt={`Post ${post.title}`} 
-                      className="w-[210px] h-[210px]" />
-                  </figure>
+                  <PostPhoto photo={post.photo} title={post.title} />
                   <div className="card-body">
                     <h2 className="card-title">{ post.title }</h2>
                     <p>{ post.author }</p>
