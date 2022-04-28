@@ -78,10 +78,11 @@ function Home() {
 
     enabledInfQueryRef.current = true
     
-    // prepareGetPost({
-    //   xsearch: paramsSearch,
-    //   xsort: paramsSort
-    // })  
+    prepareGetPost({
+      xsearch: paramsSearch,
+      xsort: paramsSort
+    })
+    
   }, [])
 
   function showPostForm({ post = null }: { post?: TPost | null } = {}) {

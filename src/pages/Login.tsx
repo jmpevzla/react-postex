@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useContext } from "react";
 import { Link, useLocation } from "wouter";
 import { useFormik } from "formik";
 import { useQueryClient } from "react-query";
@@ -9,13 +9,14 @@ import { setStUser, stOkLogin } from "@/extras/storage-extras";
 import { useLogin } from "@/hooks/rq/auth-hrq";
 import MainLayout from "@/pages/layout/MainLayout";
 import AuthLayout from "./layout/AuthLayout";
+import useAuthInit from "@/hooks/useAuthInit";
 
 export default Login;
 
 function Login() {
   const [, userDispatch] = useContext(userContext)!;
   const [, setLocation] = useLocation();
-  const [show, setShow] = useState(false);
+  const show = useAuthInit()
   const queryClient = useQueryClient();
   const login = useLogin(queryClient);
 
@@ -67,13 +68,6 @@ function Login() {
       });
     },
   });
-
-  useEffect(() => {
-    if (stOkLogin()) {
-      return setLocation("/");
-    }
-    setShow(true);
-  }, []);
 
   if (show) {
     return (

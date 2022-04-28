@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { useQueryClient } from 'react-query'
 import { useLocation } from 'wouter'
 import Swal from 'sweetalert2'
@@ -12,7 +12,7 @@ export default AppLinks
 function AppLinks({ onClickLink = () => {} }: 
   { onClickLink?: () => void }) {
   const queryClient = useQueryClient()
-  const [user, userDispatch] = useContext(userContext)!
+  const [user] = useContext(userContext)!
   const logout = useLogout(queryClient)
   const [, setLocation] = useLocation()
 
@@ -30,9 +30,6 @@ function AppLinks({ onClickLink = () => {} }:
       logout.mutate(undefined, {
         onSuccess: () => {
           clearStUser()
-          userDispatch({
-            type: clearUserAction
-          })
           setLocation('/login')
         }
       })

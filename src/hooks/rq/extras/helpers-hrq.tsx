@@ -16,6 +16,12 @@ export function onSuccessPostsFunc(queryClient: QueryClient) {
   }
 }
 
+export function onSuccessFuncRemQueries(queryClient: QueryClient) {
+  return () => {
+    queryClient.removeQueries()
+  }
+}
+
 export function getInfPage(params: QueryFunctionContext<QueryKey, number>) {
   return params.pageParam || 1
 }

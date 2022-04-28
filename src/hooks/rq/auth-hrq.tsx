@@ -4,7 +4,7 @@ import { checkEmail, getUser, login
 import type { TError, TCheckData } from "@/types/api-types";
 import type { TAuthData, TCredentials
   , TSignUp, TUser } from "@/types/auth-types";
-import { onSuccessFunc } from "./extras/helpers-hrq";
+import { onSuccessFunc, onSuccessFuncRemQueries } from "./extras/helpers-hrq";
 
 export function useLogin(queryClient: QueryClient) {
   return useMutation<TAuthData, TError, TCredentials>
@@ -41,7 +41,7 @@ export function useLogout(queryClient: QueryClient) {
     (async () => {
       await logout()
   }, {
-    onSuccess: onSuccessFunc(queryClient)
+    onSuccess: onSuccessFuncRemQueries(queryClient)
   })
 }
 
