@@ -83,7 +83,7 @@ function PostForm({ post, onCupdate }:
   return (
     <div>
       <form>
-        <div className="text-left mx-2">
+        <div className="text-left px-2 mx-2 max-h-[calc(100vh_-_15rem)] overflow-y-auto">
           { formFormik.values.id > 0 && (
             <div className="mb-3">
               <label htmlFor="inputId" 
