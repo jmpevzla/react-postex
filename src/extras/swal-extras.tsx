@@ -1,11 +1,13 @@
 import Swal from "sweetalert2"
 import withReactContent from "sweetalert2-react-content"
 import { TPost } from "@/types/posts-types"
+import { putHashParams, removeHashParams } from "@/code/queryBar"
 
 const reactSwal = withReactContent(Swal)
 
 export function createEditForm({ post = null, title, html }: 
   { post?: TPost | null, title?: string, html?: React.ReactElement } = {}) {
+  
   reactSwal.fire({
     title: (
       <span className="text-lg select-none">
@@ -31,23 +33,51 @@ export function createEditForm({ post = null, title, html }:
         
         window.addEventListener('modal-confirm', listener, { once: true })  
       })
+    },
+    didOpen: () => {
+      if (post) {
+        putHashParams('edit', post.id)
+      } else {
+        putHashParams('create')
+      }
+    },
+    didDestroy: () => {
+      removeHashParams(post ? 'edit' : 'create')
     }
   })
 }
 
-export function showForm({ post, title, html }: 
-  { post: TPost, title?: string, html?: React.ReactElement }) {
-  reactSwal.fire({
+export async function showForm({ post, title, html, onEdit, onDelete }: 
+  { post: TPost, title?: string, html?: React.ReactElement
+  , onEdit: () => void, onDelete: () => void }) {
+  const res = await reactSwal.fire({
     title: (
       <span className="text-lg select-none">
         Show {title}
       </span>
     ),
     html,
-    showCancelButton: false,
-    showDenyButton: false,
-    confirmButtonText: 'Ok'
+    showCancelButton: true,
+    showDenyButton: true,
+    cancelButtonText: 'Edit',
+    denyButtonText: 'Delete',
+    confirmButtonText: 'Ok',
+    reverseButtons: true,
+    didOpen: () => {
+      putHashParams('show', post.id)
+    },
+    didDestroy: () => {
+      removeHashParams('show')
+    }
   })
+
+  if (res.isDismissed) {
+    onEdit()
+  }
+
+  if (res.isDenied) {
+    onDelete()
+  }
 }
 
 export async function showSuccess(message: string) {

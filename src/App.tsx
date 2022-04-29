@@ -1,4 +1,4 @@
-import { Router, Switch } from 'wouter'
+import { Route, Router, Switch } from 'wouter'
 import RouteTitle from './components/RouteTitle'
 import RouteTitleAuth from './components/RouteTitleAuth'
 import SLogin from "@/suspensePages/SLogin"
@@ -15,9 +15,9 @@ function App() {
       <Switch>
         <RouteTitle path="/login" title="login" component={SLogin} />
         <RouteTitle path="/register" title="register" component={SRegister} />
-        <RouteTitleAuth path="/" title="home" component={SHome} />
         <RouteTitleAuth path="/about" title="about" component={SAbout} />
-        <RouteTitle component={SNotfound} title="not found" /> 
+        <RouteTitleAuth path="/" title="home" component={SHome} />
+        <Route component={SNotfound} />  
       </Switch>
     </Router>
   )

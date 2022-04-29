@@ -10,7 +10,7 @@ import { getApiQuerySearch, getQueryUrlSearch
   , TSearch, TSearchOpts } from "@/code/lists/search"
 import { createApiQueryObject } from "@/code/create"
 import { getInputEventValue } from "@/code/event"
-import { getMixQuery, setParamsToQueryBar } from "@/code/queryBar"
+import { getMixQuery, loadHashParams, setParamsToQueryBar } from "@/code/queryBar"
 import { useSearch } from "@/hooks/lists/useSearch"
 import { useCupdatePost, useDeletePost, useInfPosts, usePostId } from "@/hooks/rq/posts-hrq"
 import { useQueryBar } from "@/hooks/lists/useQueryBar"
@@ -86,6 +86,7 @@ function Home() {
       html: (<PostForm post={post} onCupdate={onCupdate} />),
     })
   }
+
   function onSuccessPostEditId(post: TPost) {
     preparePostForm(post)
   }
@@ -96,6 +97,8 @@ function Home() {
       post,
       title: 'Post',
       html: (<Post post={post} />),
+      onEdit: () => openEdit(post.id),
+      onDelete: () => onDeletePost(post)
     })
   }
   function onSuccessPostShowId(post: TPost) {
@@ -116,6 +119,10 @@ function Home() {
       ...paramsSearch,
       ...paramsSort
     })
+
+    loadHashParams('create', openCreate)
+    loadHashParams('edit', openEdit)
+    loadHashParams('show', openShow)
 
     enabledInfQueryRef.current = true
     
