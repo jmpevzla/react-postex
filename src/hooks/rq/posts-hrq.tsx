@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
 import { useQuery, useInfiniteQuery, QueryFunctionContext
-  , QueryKey, useMutation, QueryClient, UseQueryResult, QueryObserverResult} from "react-query"
+  , QueryKey, useMutation, QueryClient } from "react-query"
 
 import { TError, TQuery } from "@/types/api-types"
 import { TPhotoPost, TPhotoPostMutation
@@ -40,14 +40,15 @@ export function useInfPosts(query: TQuery, enabled: boolean) {
   })
 }
 
-export function usePost(id: number, enabled: boolean) {
+export function usePost(id: number) {
   return useQuery<TPost, TError>
     ([postKey, id], async () => {
       const { info } = await getPost(id)
       return info!
   }, {
     staleTime: staleTime,
-    enabled
+    enabled: false,
+  
   })
 }
 
@@ -81,26 +82,29 @@ export function useUploadPhotoPost(queryClient: QueryClient) {
   })
 }
 
-export function usePostId(enabled: boolean, 
+export function usePostId( 
   onSuccess: (post: TPost) => void):
-[React.Dispatch<React.SetStateAction<number>>, UseQueryResult<TPost, TError>] {
+React.Dispatch<React.SetStateAction<number>> {
   const [postStId, setPostStId] = useState(0)
-  const postQuery = usePost(postStId, enabled)
+  const postQuery = usePost(postStId)
 
   useEffect(() => {
-    async function init() {
-      if (postStId > 0) {
-        const postQ = await postQuery.refetch()
-        if (postQ.isSuccess) {
-          onSuccess(postQ.data)
-        } else {
-          showError(postQ.error?.message || 'Error fetch data, Try Again!')
-        }
-        setPostStId(0)
+    async function init() { 
+      let postQ = postQuery
+      if (postQuery.isStale) {
+        postQ = await postQuery.refetch()
       }
+      
+      if (postQ.isSuccess) {
+        onSuccess(postQ.data)
+      } else {
+        showError(postQ.error?.message || 'Error fetch data, Try Again!')
+      }
+      setPostStId(0)
     }
-    init()
+
+    postStId > 0 && init()
   }, [postStId])
 
-  return [setPostStId, postQuery]
+  return setPostStId
 }

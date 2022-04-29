@@ -35,6 +35,21 @@ export function createEditForm({ post = null, title, html }:
   })
 }
 
+export function showForm({ post, title, html }: 
+  { post: TPost, title?: string, html?: React.ReactElement }) {
+  reactSwal.fire({
+    title: (
+      <span className="text-lg select-none">
+        Show {title}
+      </span>
+    ),
+    html,
+    showCancelButton: false,
+    showDenyButton: false,
+    confirmButtonText: 'Ok'
+  })
+}
+
 export async function showSuccess(message: string) {
   return await Swal.fire({
     title: "Success!",
@@ -59,4 +74,19 @@ export async function showError(message: string) {
     position: "top",
     showConfirmButton: false,
   });
+}
+
+export async function showDelete({ title, html, onDelete }:
+  { title: string, html: React.ReactElement, onDelete: () => void }) {
+  const conf = await reactSwal.fire({
+    title: "Delete " + title,
+    icon: "question",
+    html,
+    showCancelButton: true,
+    showConfirmButton: true,
+  })
+
+  if (conf.isConfirmed) {
+    onDelete()
+  }
 }

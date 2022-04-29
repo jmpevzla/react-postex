@@ -1,6 +1,4 @@
 import { useEffect, useRef, useState } from "react"
-import Swal from "sweetalert2"
-import withReactContent from "sweetalert2-react-content"
 import { useQueryClient } from "react-query"
 import { mdiPencil, mdiTrashCan
   , mdiPlus, mdiSort } from "@mdi/js"
@@ -14,7 +12,7 @@ import { createApiQueryObject } from "@/code/create"
 import { getInputEventValue } from "@/code/event"
 import { getMixQuery, setParamsToQueryBar } from "@/code/queryBar"
 import { useSearch } from "@/hooks/lists/useSearch"
-import { useCupdatePost, useInfPosts, usePostId } from "@/hooks/rq/posts-hrq"
+import { useCupdatePost, useDeletePost, useInfPosts, usePostId } from "@/hooks/rq/posts-hrq"
 import { useQueryBar } from "@/hooks/lists/useQueryBar"
 import { useDebounce } from "@/hooks/useDebouce"
 import SortItem from "@/components/SortItem"
@@ -25,12 +23,10 @@ import { TCupdatePostFunc, TPost } from "@/types/posts-types"
 import PostPhoto from "@/components/PostPhoto";
 import useInsObs from "@/hooks/useInsObs"
 import LoadingComp from "@/components/LoadingComp"
-import { createEditForm, showSuccess } from "@/extras/swal-extras"
+import { createEditForm, showDelete, showError, showForm, showSuccess } from "@/extras/swal-extras"
+import PostDelete from "@/components/PostDelete"
 
 export default Home
-
-const reactSwal = withReactContent(Swal)
-
 interface TPrepareGetPostsParams {
   xstateSearch?: TSearch,
   xsearch?: TSearchOpts,
@@ -68,13 +64,13 @@ function Home() {
   const queryClient = useQueryClient()
   const cupdatePost = useCupdatePost(queryClient)
 
-  function preparePostForm({ post } : { post?: TPost } = {}) {
+  function preparePostForm(post?: TPost) {
     
     const onCupdate: TCupdatePostFunc = (values, dispatchConfirmEvent, setError) => {
 
       cupdatePost.mutate(values, {
         onSuccess: () => {
-          showSuccess(values.id ? 'Edit' : 'Create' + ' Post Successful')
+          showSuccess((values.id ? 'Edit' : 'Create') + ' Post Successful')
           dispatchConfirmEvent(true)
         }, onError: (error) => {
           setError(error.message)
@@ -90,12 +86,25 @@ function Home() {
       html: (<PostForm post={post} onCupdate={onCupdate} />),
     })
   }
-
-  function onSuccessPostId(post: TPost) {
-    preparePostForm({ post })
+  function onSuccessPostEditId(post: TPost) {
+    preparePostForm(post)
   }
-  const [setPostEditId, postEditQuery] = usePostId(false, onSuccessPostId)
+  const setPostEditId = usePostId(onSuccessPostEditId)
   
+  function preparePostShow(post: TPost) {
+    showForm({
+      post,
+      title: 'Post',
+      html: (<Post post={post} />),
+    })
+  }
+  function onSuccessPostShowId(post: TPost) {
+    preparePostShow(post)
+  }
+  const setPostShowId = usePostId(onSuccessPostShowId)
+
+  const deletePost = useDeletePost(queryClient)
+
   useEffect(() => {
     let paramsSearch: TSearchOpts = getQueryUrlSearch()
     setSearch(paramsSearch)
@@ -121,22 +130,28 @@ function Home() {
     preparePostForm()
   }
 
-  async function openEdit(postId: number) {
+  function openEdit(postId: number) {
     setPostEditId(postId)
   }
 
-  async function openShow(id: number) {
-    
-    const res = { data: { id, title: 'TEST', author: 'TEST', photo: '' } }//await getPost(id)
-    const post: TPost = res?.data 
+  function openShow(postId: number) {
+    setPostShowId(postId)    
+  }
 
-    await reactSwal.fire({
-      title: (
-        <h2 className="text-lg select-none">
-          Show Post
-        </h2>
-      ),
-      html: (<Post post={post} />)
+  function onDeletePost(post: TPost) {
+    showDelete({
+      title: 'Post',
+      html: (<PostDelete post={post} />),
+      onDelete: () => {
+        deletePost.mutate(post.id, {
+          onSuccess: () => {
+            showSuccess('Post Deleted Successful!')
+          },
+          onError: (error) => {
+            showError(error.message)
+          }
+        })
+      }
     })
   }
 
@@ -224,7 +239,7 @@ function Home() {
                         <button className="btn btn-primary mr-1" onClick={() => openEdit(post.id)}>
                           <Icon path={mdiPencil} size={1} />
                         </button>
-                        <button className="btn btn-error">
+                        <button className="btn btn-error" onClick={() => onDeletePost(post)}>
                           <Icon path={mdiTrashCan} size={1} />
                         </button>
                       </div>

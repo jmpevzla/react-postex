@@ -1,6 +1,6 @@
-export default Post
+import { TPost } from "@/types/posts-types"
 
-type TPost = any
+export default Post
 
 function Post({ post }: { post: TPost }) {
   
