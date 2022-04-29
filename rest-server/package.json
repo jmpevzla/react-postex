@@ -6,7 +6,8 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "start": "nodemon server.js -- --watch db.json --routes routes.json --port 4000 --static ./public",
+    "start": "node server.js --watch db.json --routes routes.json --port 4000 --static ./public",
+    "watch": "nodemon server.js -- --watch db.json --routes routes.json --port 4000 --static ./public",
     "js": "node server.js --watch db.js --routes routes.json --port 4000 --static ./public --middlewares ./middlewares/middleware.js",
     "chalet-start": "chalet add 'npm start' -p 4000 && chalet start",
     "chalet-stop": "chalet stop",

@@ -15,7 +15,7 @@ function PageError({ error }: { error: string }) {
         </div>
         <p className="italic font-bold text-error-content mb-3">{ error }</p>
         <p className="italic font-bold">
-          Go to <Link href="/"><a className="link">home page</a></Link>
+          <a className="link" onClick={() => window.location.reload()}>Reload Page Now</a>
         </p>
       </div>
     </MainLayout>

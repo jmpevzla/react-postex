@@ -2,18 +2,18 @@ import { useState, useEffect } from 'react'
 import { useFormik } from 'formik'
 import { mdiUpload } from "@mdi/js"
 import { Icon } from "@mdi/react"
+import { TCupdatePostFunc, TPost } from '@/types/posts-types'
 
 export default PostForm
-
-type TPost = any
-
 interface TFieldErrors {
   title?: string,
   author?: string,
   photo?: string
 }
 
-function PostForm({ post }: { post: TPost }) {
+function PostForm({ post, onCupdate }: 
+  { post?: TPost, 
+    onCupdate: TCupdatePostFunc }) {
   const [error, setError] = useState('')
   const [fieldErrors, setFieldErrors] = useState<TFieldErrors>({})
 
@@ -32,22 +32,13 @@ function PostForm({ post }: { post: TPost }) {
     initialValues: {
       id: post?.id || 0,
       title: post?.title || '',
-      author: post?.author || ''
+      author: post?.author || '',
+      photo: post?.photo || null
     },
     validate,
     onSubmit: async (values: TPost) => {
       setError('')
-      // const res = await cupdatePost(values)
-
-      // setTimeout(() => {
-      //   if (res?.status === 200 || res?.status === 201) {
-      //     dispatchConfirmEvent(true)
-      //   }
-
-      //   setError('Error, try again!')
-      //   dispatchConfirmEvent(false)
-
-      // }, 2000)
+      onCupdate(values, dispatchConfirmEvent, setError)
     },
     onReset: () => {
       setError('')
@@ -100,7 +91,8 @@ function PostForm({ post }: { post: TPost }) {
               <input id="inputId" 
                 className="
                   input input-bordered text-xl 
-                  p-2 w-full mt-1
+                  p-2 w-full mt-1 border-1
+                  !border-gray-600 !cursor-default
                 " 
                 defaultValue={formFormik.values.id} disabled />
             </div>
@@ -128,7 +120,8 @@ function PostForm({ post }: { post: TPost }) {
                 p-2 w-full mt-1
               "
               name="author" value={formFormik.values.author} 
-              onChange={formFormik.handleChange} />
+              onChange={formFormik.handleChange} 
+            />
             {fieldErrors.author && <p className="text-error">* {fieldErrors.author}</p>}
           </div>
 

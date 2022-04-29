@@ -5,7 +5,7 @@ import loadingImage from "@/assets/loading-ani.gif"
 
 export default PostPhoto
 
-function PostPhoto({ photo, title }: { photo: string, title: string }) {
+function PostPhoto({ photo, title }: { photo: string | null, title: string }) {
   return (
     <figure>
       {photo ? (

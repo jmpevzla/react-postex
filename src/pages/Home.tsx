@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import Swal from "sweetalert2"
 import withReactContent from "sweetalert2-react-content"
+import { useQueryClient } from "react-query"
 import { mdiPencil, mdiTrashCan
   , mdiPlus, mdiSort } from "@mdi/js"
 import { Icon } from "@mdi/react"
@@ -13,17 +14,18 @@ import { createApiQueryObject } from "@/code/create"
 import { getInputEventValue } from "@/code/event"
 import { getMixQuery, setParamsToQueryBar } from "@/code/queryBar"
 import { useSearch } from "@/hooks/lists/useSearch"
-import { useInfPosts } from "@/hooks/rq/posts-hrq"
+import { useCupdatePost, useInfPosts, usePostId } from "@/hooks/rq/posts-hrq"
 import { useQueryBar } from "@/hooks/lists/useQueryBar"
 import { useDebounce } from "@/hooks/useDebouce"
 import SortItem from "@/components/SortItem"
 import { useSort } from "@/hooks/lists/useSort"
 import { getApiQuerySort, getQueryUrlSort
   , TSort, TSortOpts } from "@/code/lists/sort"
-import { TPost } from "@/types/posts-types"
+import { TCupdatePostFunc, TPost } from "@/types/posts-types"
 import PostPhoto from "@/components/PostPhoto";
 import useInsObs from "@/hooks/useInsObs"
 import LoadingComp from "@/components/LoadingComp"
+import { createEditForm, showSuccess } from "@/extras/swal-extras"
 
 export default Home
 
@@ -63,7 +65,37 @@ function Home() {
     }
   }
   const loadMoreRef = useInsObs(onInsObsEvent, infPostsQuery.dataUpdatedAt)
+  const queryClient = useQueryClient()
+  const cupdatePost = useCupdatePost(queryClient)
 
+  function preparePostForm({ post } : { post?: TPost } = {}) {
+    
+    const onCupdate: TCupdatePostFunc = (values, dispatchConfirmEvent, setError) => {
+
+      cupdatePost.mutate(values, {
+        onSuccess: () => {
+          showSuccess(values.id ? 'Edit' : 'Create' + ' Post Successful')
+          dispatchConfirmEvent(true)
+        }, onError: (error) => {
+          setError(error.message)
+          dispatchConfirmEvent(false)
+        }
+      })
+
+    }
+      
+    createEditForm({
+      post,
+      title: 'Post',
+      html: (<PostForm post={post} onCupdate={onCupdate} />),
+    })
+  }
+
+  function onSuccessPostId(post: TPost) {
+    preparePostForm({ post })
+  }
+  const [setPostEditId, postEditQuery] = usePostId(false, onSuccessPostId)
+  
   useEffect(() => {
     let paramsSearch: TSearchOpts = getQueryUrlSearch()
     setSearch(paramsSearch)
@@ -85,38 +117,12 @@ function Home() {
     
   }, [])
 
-  function showPostForm({ post = null }: { post?: TPost | null } = {}) {
-    reactSwal.fire({
-      title: (
-        <h2 className="text-lg select-none">
-          { post ? 'Edit' : 'Create'} Post
-        </h2>
-      ),
-      html: (<PostForm post={post} />),
-      showCancelButton: true,
-      showDenyButton: true,
-      confirmButtonText: 'Ok',
-      cancelButtonText: 'Cancel',
-      denyButtonText: 'Reset',
-      reverseButtons: true,
-      showLoaderOnConfirm: true,
-      showLoaderOnDeny: true,
-      preDeny: () => false,
-      preConfirm: () => {
-        return new Promise<boolean>((resolve) => {
-          const listener = (ev: Event) => {
-            const customEv = ev as CustomEvent<boolean>
-            resolve(customEv.detail)
-          }
-          
-          window.addEventListener('modal-confirm', listener, { once: true })  
-        })
-      }
-    })
+  function openCreate() {
+    preparePostForm()
   }
 
-  function openCreate() {
-    showPostForm()
+  async function openEdit(postId: number) {
+    setPostEditId(postId)
   }
 
   async function openShow(id: number) {
@@ -203,7 +209,7 @@ function Home() {
           </div>
         </div>
 
-        <div className={`h-[calc(100vh_-_8.50rem)] pr-5 overflow-y-scroll`}>
+        <div className={`h-[calc(100vh_-_8.50rem)] pr-5 overflow-y-auto`}>
           {infPostsQuery.data?.pages.map(page => {
             
             return page.data.map(post => (
@@ -214,15 +220,14 @@ function Home() {
                     <h2 className="card-title">{ post.title }</h2>
                     <p>{ post.author }</p>
                     <div className="card-actions justify-end">
-                      {/* <button className="btn btn-accent">
-                        <Icon path={mdiEye} size={1} />
-                      </button> */}
-                      <button className="btn btn-primary">
-                        <Icon path={mdiPencil} size={1} />
-                      </button>
-                      <button className="btn btn-error">
-                        <Icon path={mdiTrashCan} size={1} />
-                      </button>
+                      <div className="inline-block" onClick={(ev) => ev.stopPropagation()}>
+                        <button className="btn btn-primary mr-1" onClick={() => openEdit(post.id)}>
+                          <Icon path={mdiPencil} size={1} />
+                        </button>
+                        <button className="btn btn-error">
+                          <Icon path={mdiTrashCan} size={1} />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>

@@ -4,7 +4,7 @@ interface TPost {
   id: number,
   title: string,
   author: string,
-  photo: string
+  photo: string | null
 }
 type TPostCreate = Omit<TPost, 'id'>
 type TPosts = TPost[]
@@ -28,3 +28,7 @@ interface TPhotoPostMutation {
   id: number,
   photo: File
 }
+
+type TCupdatePostFunc = (values: TPost, 
+  dispatchConfirmEvent: (value: boolean) => void, 
+  setError: React.Dispatch<React.SetStateAction<string>>) => void

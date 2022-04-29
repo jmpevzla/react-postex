@@ -1,0 +1,158 @@
+{
+  "posts": [
+    {
+      "id": 6,
+      "title": "Aladdin 2",
+      "author": "Sega Genesis",
+      "photo": "uploads/photo-1647904671105-249559290.jpg"
+    },
+    {
+      "id": 2,
+      "title": "God of War 3",
+      "author": "Playstation ® 3",
+      "photo": "uploads/photo-1648716518947-587123281.jpg"
+    },
+    {
+      "title": "Rush 2049",
+      "author": "Sega Dreamcast",
+      "id": 3,
+      "photo": "uploads/photo-1647904671105-249559290 (copy 2).jpg"
+    },
+    {
+      "id": 4,
+      "title": "Need for Speed High Stakes",
+      "author": "Playstation One",
+      "photo": "uploads/photo-1647904671105-249559290 (copy 3).jpg"
+    },
+    {
+      "id": 5,
+      "title": "Need for Speed Most Wanted",
+      "author": "Playstation 2",
+      "photo": "uploads/photo-1647904671105-249559290 (copy 4).jpg"
+    },
+    {
+      "title": "Need for Speed 2",
+      "author": "Playstation One",
+      "id": 7,
+      "photo": "uploads/photo-1647904671105-249559290 (copy 5).jpg"
+    },
+    {
+      "id": 8,
+      "title": "Aladdin 2",
+      "author": "Sega Genesis",
+      "photo": "uploads/photo-1647904671105-249559290 (copy 6).jpg"
+    },
+    {
+      "id": 9,
+      "title": "God of War 3",
+      "author": "Playstation ® 3",
+      "photo": "uploads/photo-1647904671105-249559290 (copy 7).jpg"
+    },
+    {
+      "title": "Final Fantasy XII",
+      "author": "Playstation 2",
+      "id": 10,
+      "photo": "uploads/photo-1647904671105-249559290 (copy 8).jpg"
+    },
+    {
+      "id": 11,
+      "title": "Need for Speed High Stakes",
+      "author": "Playstation One",
+      "photo": "uploads/photo-1647904671105-249559290 (copy 9).jpg"
+    },
+    {
+      "id": 12,
+      "title": "Need for Speed Most Wanted",
+      "author": "Playstation 2",
+      "photo": "uploads/photo-1647904671105-249559290 (copy 10).jpg"
+    },
+    {
+      "title": "Need for Speed 2",
+      "author": "Playstation One",
+      "id": 13,
+      "photo": "uploads/photo-1647904671105-249559290 (copy 11).jpg"
+    },
+    {
+      "id": 14,
+      "title": "Aladdin 2",
+      "author": "Sega Genesis",
+      "photo": "uploads/photo-1647904671105-249559290 (copy 12).jpg"
+    },
+    {
+      "id": 15,
+      "title": "God of War 3",
+      "author": "Playstation ® 3",
+      "photo": "uploads/photo-1647904671105-249559290 (copy 13).jpg"
+    },
+    {
+      "title": "Final Fantasy XII",
+      "author": "Playstation 2",
+      "id": 16,
+      "photo": "uploads/photo-1647904671105-249559290 (copy 14).jpg"
+    },
+    {
+      "id": 17,
+      "title": "Need for Speed High Stakes",
+      "author": "Playstation One",
+      "photo": "uploads/photo-1647904671105-249559290 (copy 15).jpg"
+    },
+    {
+      "id": 18,
+      "title": "Need for Speed Most Wanted",
+      "author": "Playstation 2",
+      "photo": "uploads/photo-1647904671105-249559290 (copy 16).jpg"
+    },
+    {
+      "title": "Need for Speed 2",
+      "author": "Playstation One",
+      "id": 19,
+      "photo": "uploads/photo-1647904671105-249559290 (copy 17).jpg"
+    },
+    {
+      "id": 20,
+      "title": "Aladdin 2",
+      "author": "Sega Genesis",
+      "photo": "uploads/photo-1647904671105-249559290 (copy 18).jpg"
+    },
+    {
+      "id": 21,
+      "title": "Aladdin 2",
+      "author": "Sega Genesis",
+      "photo": "uploads/photo-1647904671105-249559290 (copy 19).jpg"
+    },
+    {
+      "id": 22,
+      "title": "Aladdin 2",
+      "author": "Sega Genesis",
+      "photo": "uploads/photo-1647904671105-249559290 (copy 20).jpg"
+    },
+    {
+      "id": 23,
+      "title": "Aladdin 2",
+      "author": "Sega Genesis",
+      "photo": "uploads/photo-1647904671105-249559290 (copy 21).jpg"
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "name": "Jose Perez",
+      "email": "joseperez@postex.io",
+      "password": "admin123"
+    },
+    {
+      "name": "Jose Manuel Perez",
+      "email": "jmperezvzla@gmail.com",
+      "password": "malta01",
+      "id": 2
+    },
+    {
+      "name": "Jose Perez",
+      "email": "joseperezart@postex.com",
+      "password": "alpha123",
+      "id": 3
+    }
+  ],
+  "check": {},
+  "logout": {}
+}

@@ -1,6 +1,6 @@
-import { useMemo } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useQuery, useInfiniteQuery, QueryFunctionContext
-  , QueryKey, useMutation, QueryClient} from "react-query"
+  , QueryKey, useMutation, QueryClient, UseQueryResult, QueryObserverResult} from "react-query"
 
 import { TError, TQuery } from "@/types/api-types"
 import { TPhotoPost, TPhotoPostMutation
@@ -11,6 +11,7 @@ import { infPlaceholder, postKey
   , postsKey, staleTime } from "./extras/config-hrq"
 import { onSuccessPostsFunc } from "./extras/helpers-hrq"
 import InfQueryBuilder from "./builders/infQueryBuilder-hrq"
+import { showError } from "@/extras/swal-extras"
 
 export function useInfPosts(query: TQuery, enabled: boolean) {
   const infQueryBuilder = useMemo(() => new InfQueryBuilder<TPosts>(), [])
@@ -39,13 +40,14 @@ export function useInfPosts(query: TQuery, enabled: boolean) {
   })
 }
 
-export function usePost(id: number) {
+export function usePost(id: number, enabled: boolean) {
   return useQuery<TPost, TError>
     ([postKey, id], async () => {
       const { info } = await getPost(id)
       return info!
   }, {
-    staleTime: staleTime
+    staleTime: staleTime,
+    enabled
   })
 }
 
@@ -79,4 +81,26 @@ export function useUploadPhotoPost(queryClient: QueryClient) {
   })
 }
 
+export function usePostId(enabled: boolean, 
+  onSuccess: (post: TPost) => void):
+[React.Dispatch<React.SetStateAction<number>>, UseQueryResult<TPost, TError>] {
+  const [postStId, setPostStId] = useState(0)
+  const postQuery = usePost(postStId, enabled)
 
+  useEffect(() => {
+    async function init() {
+      if (postStId > 0) {
+        const postQ = await postQuery.refetch()
+        if (postQ.isSuccess) {
+          onSuccess(postQ.data)
+        } else {
+          showError(postQ.error?.message || 'Error fetch data, Try Again!')
+        }
+        setPostStId(0)
+      }
+    }
+    init()
+  }, [postStId])
+
+  return [setPostStId, postQuery]
+}
