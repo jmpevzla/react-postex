@@ -1,0 +1,25 @@
+img.posts {
+  position: relative;  
+}
+
+img.posts-photo {
+  object-fit: cover;
+  height: 210px;
+  width: 210px;
+}
+
+img.posts::after {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding-top: calc(50% - 1rem);
+  background-color: #fff;
+  font-family: 'Helvetica';
+  text-align: center;
+  font-weight: 300;
+  line-height: 2;
+  font-style: italic;
+  content: attr(alt);
+} 

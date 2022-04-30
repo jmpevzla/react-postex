@@ -1,0 +1,44 @@
+{
+  "posts": [
+    {
+      "title": "Top Gear",
+      "author": "Super Nintendo",
+      "photo": null,
+      "id": 2
+    },
+    {
+      "title": "Mario Kart",
+      "author": "Super Nintendo",
+      "photo": null,
+      "id": 3
+    },
+    {
+      "id": 5,
+      "title": "Bomberman Super",
+      "author": "Super Nintendo",
+      "photo": null
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "name": "Jose Perez",
+      "email": "joseperez@postex.io",
+      "password": "admin123"
+    },
+    {
+      "name": "Jose Manuel Perez",
+      "email": "jmperezvzla@gmail.com",
+      "password": "malta01",
+      "id": 2
+    },
+    {
+      "name": "Jose Perez",
+      "email": "joseperezart@postex.com",
+      "password": "alpha123",
+      "id": 3
+    }
+  ],
+  "check": {},
+  "logout": {}
+}

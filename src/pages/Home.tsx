@@ -10,9 +10,11 @@ import { getApiQuerySearch, getQueryUrlSearch
   , TSearch, TSearchOpts } from "@/code/lists/search"
 import { createApiQueryObject } from "@/code/create"
 import { getInputEventValue } from "@/code/event"
-import { getMixQuery, loadHashParams, setParamsToQueryBar } from "@/code/queryBar"
+import { getMixQuery, loadHashParams
+  , setParamsToQueryBar } from "@/code/queryBar"
 import { useSearch } from "@/hooks/lists/useSearch"
-import { useCupdatePost, useDeletePost, useInfPosts, usePostId } from "@/hooks/rq/posts-hrq"
+import { useCupdatePost, useDeletePost
+  , useInfPosts, usePostId } from "@/hooks/rq/posts-hrq"
 import { useQueryBar } from "@/hooks/lists/useQueryBar"
 import { useDebounce } from "@/hooks/useDebouce"
 import SortItem from "@/components/SortItem"
@@ -23,8 +25,10 @@ import { TCupdatePostFunc, TPost } from "@/types/posts-types"
 import PostPhoto from "@/components/PostPhoto";
 import useInsObs from "@/hooks/useInsObs"
 import LoadingComp from "@/components/LoadingComp"
-import { createEditForm, showDelete, showError, showForm, showSuccess } from "@/extras/swal-extras"
+import { createEditForm, showDelete, showError
+  , showForm, showSuccess } from "@/extras/swal-extras"
 import PostDelete from "@/components/PostDelete"
+import PostsError from "@/components/PostsError"
 
 export default Home
 interface TPrepareGetPostsParams {
@@ -257,8 +261,14 @@ function Home() {
             ))
 
           })}
-          <div ref={loadMoreRef} className="h-3" />
-          {infPostsQuery.isFetching && <LoadingComp />}
+          {infPostsQuery.isError ? 
+            <PostsError error={infPostsQuery.error.message} refetch={infPostsQuery.refetch} />
+          :
+            <>
+              <div ref={loadMoreRef} className="h-3" />
+              {infPostsQuery.isFetching && <LoadingComp />}
+            </>
+          }
         </div>
 
         <div className="fixed bottom-4 right-8">
