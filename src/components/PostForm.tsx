@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useFormik } from 'formik'
-import { mdiUpload } from "@mdi/js"
-import { Icon } from "@mdi/react"
-import { TCupdatePostFunc, TPost } from '@/types/posts-types'
+import { TCupdatePostFunc, TPost
+  , TUpdatePhotoFunc } from '@/types/posts-types'
+
+import useSwalOkReset from '@/hooks/useSwalOkReset'
+import UploadPhoto from './UploadPhoto'
 
 export default PostForm
 interface TFieldErrors {
@@ -11,9 +13,10 @@ interface TFieldErrors {
   photo?: string
 }
 
-function PostForm({ post, onCupdate }: 
+function PostForm({ post, onCupdate, onUploadPhoto }: 
   { post?: TPost, 
-    onCupdate: TCupdatePostFunc }) {
+    onCupdate: TCupdatePostFunc,
+    onUploadPhoto: TUpdatePhotoFunc }) {
   const [error, setError] = useState('')
   const [fieldErrors, setFieldErrors] = useState<TFieldErrors>({})
 
@@ -51,95 +54,91 @@ function PostForm({ post, onCupdate }:
     return window.dispatchEvent(ev)
   }
 
-  useEffect(() => {
+  function handleChangePhoto(ev: React.ChangeEvent<HTMLInputElement>) {
+    if (post && ev.currentTarget.files) {
+      const photo = ev.currentTarget.files[0]
 
-    const btnOk = document.querySelector('.swal2-actions > button.swal2-confirm') as HTMLButtonElement
-    const btnReset = document.querySelector('.swal2-actions > button.swal2-deny') as HTMLButtonElement
-
-    const listOk = async () => {
-      const errors = await formFormik.validateForm()
-      setFieldErrors(errors)
-      
-      if (Object.keys(errors).length > 0) {
-        dispatchConfirmEvent(false)
+      function setPhoto(photo: string) {
+        formFormik.setFieldValue('photo', photo)
       }
 
-      formFormik.submitForm()
+      onUploadPhoto(post.id, photo, setPhoto, setError)
+    }
+  }
+
+  async function onOk() {
+    const errors = await formFormik.validateForm()
+    setFieldErrors(errors)
+    
+    if (Object.keys(errors).length > 0) {
+      dispatchConfirmEvent(false)
     }
 
-    const listReset = () => {
-      formFormik.resetForm()
-    }
-
-    btnOk?.addEventListener('click', listOk)
-    btnReset?.addEventListener('click', listReset)
-
-    return () => {
-      btnOk?.removeEventListener('click', listOk)
-      btnReset?.removeEventListener('click', listReset)
-    }
-  }, [])
+    formFormik.submitForm()
+  }
+  function onReset() {
+    formFormik.resetForm()
+  }
+  useSwalOkReset(onOk, onReset)
 
   return (
     <div>
       <form>
-        <div className="text-left px-2 mx-2 max-h-[calc(100vh_-_15rem)] overflow-y-auto">
-          { formFormik.values.id > 0 && (
+        <div className="
+          text-left px-2 mx-2 
+          max-h-[calc(100vh_-_15rem)] overflow-y-auto
+          grid grid-rows-[1fr-275px] gap-2
+          md:grid-rows-none md:grid-cols-[1fr_210px]
+        ">
+          <div>
+            { formFormik.values.id > 0 && (
+              <div className="mb-3">
+                <label htmlFor="inputId" 
+                  className="font-bold tracking-wider text-xs">ID</label>
+                <input id="inputId" 
+                  className="
+                    input input-bordered text-xl 
+                    p-2 w-full mt-1 border-1
+                    !border-gray-600 !cursor-default
+                  " 
+                  defaultValue={formFormik.values.id} disabled />
+              </div>
+            )}
+            
             <div className="mb-3">
-              <label htmlFor="inputId" 
-                className="font-bold tracking-wider text-xs">ID</label>
-              <input id="inputId" 
+              <label htmlFor="inputTitle" 
+                className="font-bold tracking-wider text-xs">Title</label>
+              <input id="inputTitle"
                 className="
-                  input input-bordered text-xl 
-                  p-2 w-full mt-1 border-1
-                  !border-gray-600 !cursor-default
-                " 
-                defaultValue={formFormik.values.id} disabled />
+                  input input-primary text-xl 
+                  p-2 w-full mt-1
+                "
+                name="title" value={formFormik.values.title} 
+                onChange={formFormik.handleChange} />
+              {fieldErrors.title && <p className="text-error">* {fieldErrors.title}</p>}
             </div>
-          )}
-          
-          <div className="mb-3">
-            <label htmlFor="inputTitle" 
-              className="font-bold tracking-wider text-xs">Title</label>
-            <input id="inputTitle"
-              className="
-                input input-primary text-xl 
-                p-2 w-full mt-1
-              "
-              name="title" value={formFormik.values.title} 
-              onChange={formFormik.handleChange} />
-            {fieldErrors.title && <p className="text-error">* {fieldErrors.title}</p>}
+
+            <div className="mb-3">
+              <label htmlFor="inputAuthor" 
+                className="font-bold tracking-wider text-xs">Author</label>
+              <input id="inputAuthor" 
+                className="
+                  input input-primary text-xl 
+                  p-2 w-full mt-1
+                "
+                name="author" value={formFormik.values.author} 
+                onChange={formFormik.handleChange} 
+              />
+              {fieldErrors.author && <p className="text-error">* {fieldErrors.author}</p>}
+            </div>
           </div>
 
-          <div className="mb-3">
-            <label htmlFor="inputAuthor" 
-              className="font-bold tracking-wider text-xs">Author</label>
-            <input id="inputAuthor" 
-              className="
-                input input-primary text-xl 
-                p-2 w-full mt-1
-              "
-              name="author" value={formFormik.values.author} 
-              onChange={formFormik.handleChange} 
-            />
-            {fieldErrors.author && <p className="text-error">* {fieldErrors.author}</p>}
-          </div>
-
-          <div className="mb-3">
-            <input id="inputPhoto" type="file" className="form-control-file hidden" 
-                  name="photo" onChange={() => {}} 
-                  accept=".jpg,.gif,.svg,.png" title="" value="" />
-            <label htmlFor="inputPhoto" 
-              className="btn btn-info tracking-wider text-sm">
-              <Icon path={mdiUpload} size={1} /> Photo
-            </label>
-            {/*photo.preview && <div className="mb-2">
-                <label htmlFor="file">
-                  <img alt="photo" src={photo.preview} className="w-32" />
-                  <p>{photo.name}</p>
-                </label>
-            </div>*/}
-            {fieldErrors.photo && <p className="text-error">* {fieldErrors.photo}</p>}
+          <div className="mb-3 flex justify-center">
+            <UploadPhoto onChange={handleChangePhoto} 
+              title={formFormik.values.title} 
+              photo={formFormik.values.photo} />
+            
+            {/*fieldErrors.photo && <p className="text-error">* {fieldErrors.photo}</p>*/}
           </div>
         </div>
       </form>

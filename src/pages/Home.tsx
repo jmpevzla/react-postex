@@ -14,14 +14,14 @@ import { getMixQuery, loadHashParams
   , setParamsToQueryBar } from "@/code/queryBar"
 import { useSearch } from "@/hooks/lists/useSearch"
 import { useCupdatePost, useDeletePost
-  , useInfPosts, usePostId } from "@/hooks/rq/posts-hrq"
+  , useInfPosts, usePostId, useUploadPhotoPost } from "@/hooks/rq/posts-hrq"
 import { useQueryBar } from "@/hooks/lists/useQueryBar"
 import { useDebounce } from "@/hooks/useDebouce"
 import SortItem from "@/components/SortItem"
 import { useSort } from "@/hooks/lists/useSort"
 import { getApiQuerySort, getQueryUrlSort
   , TSort, TSortOpts } from "@/code/lists/sort"
-import { TCupdatePostFunc, TPost } from "@/types/posts-types"
+import { TCupdatePostFunc, TPost, TUpdatePhotoFunc } from "@/types/posts-types"
 import PostPhoto from "@/components/PostPhoto";
 import useInsObs from "@/hooks/useInsObs"
 import LoadingComp from "@/components/LoadingComp"
@@ -67,6 +67,7 @@ function Home() {
   const loadMoreRef = useInsObs(onInsObsEvent, infPostsQuery.dataUpdatedAt)
   const queryClient = useQueryClient()
   const cupdatePost = useCupdatePost(queryClient)
+  const uploadPhotoPost = useUploadPhotoPost(queryClient)
 
   function preparePostForm(post?: TPost) {
     
@@ -83,11 +84,24 @@ function Home() {
       })
 
     }
+
+    const onUploadPhoto: TUpdatePhotoFunc = (id, photo, setPhoto, setError) => {
+      uploadPhotoPost.mutate({ id, photo }, {
+        onSuccess: (data) => {
+          setPhoto(data.photo)
+        },
+        onError: (error) => {
+          setError(error.message)
+        }
+      })
+    }
       
     createEditForm({
       post,
       title: 'Post',
-      html: (<PostForm post={post} onCupdate={onCupdate} />),
+      html: (<PostForm post={post} 
+        onCupdate={onCupdate} 
+        onUploadPhoto={onUploadPhoto} />),
     })
   }
 

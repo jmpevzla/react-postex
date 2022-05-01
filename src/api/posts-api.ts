@@ -1,8 +1,7 @@
 import { AxiosResponse } from 'axios'
-import omit from 'lodash/omit'
 import { TQuery } from '@/types/api-types'
 import { TPostsResponse, TPostResponse, TPost, 
-  TPostCreate, TPhotoPostResponse, TPostsTotalResponse } from '@/types/posts-types'
+  TPostCreate, TPhotoPostResponse, TPostsTotalResponse, TPhotoPost } from '@/types/posts-types'
 import axios, { axiosUpload } from './extras/get-axios'
 import { getTotalCount } from './extras/utils-api'
 import { preparePhoto } from '@/code/entities/post'
@@ -31,7 +30,7 @@ export async function getPost(id: number): Promise<TPostResponse> {
     info: res.data.info ? preparePhoto(res.data.info) : null
   }
 
-  return data
+  return data 
 }
 
 export async function deletePost(id: number): Promise<TPostResponse> {
@@ -44,11 +43,13 @@ export async function deletePost(id: number): Promise<TPostResponse> {
 export async function cupdatePost(post: TPost): Promise<TPostResponse> {
   let res
   if (post.id > 0) {
+    const photoSplit = post.photo?.split('/uploads')
+    post.photo = photoSplit ? '/uploads' + photoSplit[1] : null
     res = await axios.put<any, AxiosResponse<TPostResponse>, TPost>
       (`/posts/${post.id}`, post)
   } else {
     res = await axios.post<any, AxiosResponse<TPostResponse>, TPostCreate>
-      (`/posts`, omit(post, 'id'))
+      (`/posts`, post)
   }
 
   return res.data
@@ -59,7 +60,7 @@ export async function uploadPhotoPost(id: number, photo: File): Promise<TPhotoPo
   formData.append('photo', photo)
 
   const res = await axiosUpload.post<any, AxiosResponse<TPhotoPostResponse>, FormData>
-    (`/posts/upload/${id}`, formData)
+    (`/posts/${id}/upload`, formData)
 
   return res.data
 }

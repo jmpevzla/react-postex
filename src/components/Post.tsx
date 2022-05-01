@@ -8,16 +8,12 @@ function Post({ post }: { post: TPost }) {
   return (
     <div>
       <div className="
-        grid gap-2 grid-rows-[150px_1fr]
-        overflow-y-auto max-h-[calc(100vh_-_15rem)]
-        md:overflow-y-hidden md:max-h-auto
-        md:grid-rows-none md:grid-cols-[200px_1fr]
+          grid gap-2 grid-rows-[1fr_275px]
+          overflow-y-auto max-h-[calc(100vh_-_15rem)]
+          md:overflow-y-hidden md:max-h-auto
+          md:grid-rows-none md:grid-cols-[1fr_210px]
         ">
-        <div className="mb-3 flex items-center">
-          <div className="border-4 rounded-lg p-1 mx-auto">
-            <PostPhotoShow photo={post.photo} title={post.title} />
-          </div>
-        </div>
+       
         <div className="text-left px-2 md:max-h-[calc(100vh_-_15rem)] md:overflow-y-auto">
           <div className="mb-3">
             <p className="font-bold text-xs select-none">ID</p>
@@ -34,6 +30,11 @@ function Post({ post }: { post: TPost }) {
             <p className="border-2 rounded-lg text-xl p-2">{ post.author }</p>
           </div>
     
+        </div>
+        <div className="mb-3 flex items-center">
+          <div className="border-4 rounded-lg p-1 md:border-1 mx-auto">
+            <PostPhotoShow photo={post.photo} title={post.title} />
+          </div>
         </div>
       </div>
     </div>

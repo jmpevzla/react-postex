@@ -32,3 +32,7 @@ interface TPhotoPostMutation {
 type TCupdatePostFunc = (values: TPost, 
   dispatchConfirmEvent: (value: boolean) => void, 
   setError: React.Dispatch<React.SetStateAction<string>>) => void
+
+type TUpdatePhotoFunc = (id: number, photo: File,
+  setPhoto: (photo: string) => void, 
+  setError: React.Dispatch<React.SetStateAction<string>>) => void
