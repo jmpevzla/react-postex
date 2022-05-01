@@ -5,6 +5,10 @@ import { TCupdatePostFunc, TPost
 
 import useSwalOkReset from '@/hooks/useSwalOkReset'
 import UploadPhoto from './UploadPhoto'
+import { checkFilesExist, checkPhotos, createURL
+  , getSimpleFile, revokeURL } from '@/code/file'
+import { getInputEventFile } from '@/code/event'
+import useUnmountRevokeURL from '@/hooks/useUnmountRevokeURL'
 
 export default PostForm
 interface TFieldErrors {
@@ -58,26 +62,12 @@ function PostForm({ post, onCupdate, onUploadPhoto, }:
   function handleChangePhoto(ev: React.ChangeEvent<HTMLInputElement>) {
     setError('')
 
-    let photoFile: File
-    if (ev.currentTarget.files) {
-      photoFile = ev.currentTarget.files[0]  
-      
-      switch(photoFile.type) {
-        case 'image/jpeg':
-          break
-        case 'image/png':          
-          break
-        case 'image/gif':
-          break
-        case 'image/svg+xml':
-          break
-        default:
-          return
-      }
-
-      URL.revokeObjectURL(formFormik.values.photo || '')
-    } else {
-      return
+    const files = getInputEventFile(ev)
+    if (!checkFilesExist(files)) return
+    
+    const photoFile = getSimpleFile(files!)
+    if (!checkPhotos(photoFile)) {
+      return setError('File Invalid')
     }
 
     function setPhoto(photo: string) {
@@ -89,7 +79,7 @@ function PostForm({ post, onCupdate, onUploadPhoto, }:
     } 
     
     if (ev.currentTarget.files) {
-      const url = URL.createObjectURL(photoFile)
+      const url = createURL(photoFile)
       formFormik.setFieldValue('photo', url)
       createPhotoRef.current = photoFile
     }
@@ -109,12 +99,7 @@ function PostForm({ post, onCupdate, onUploadPhoto, }:
     formFormik.resetForm()
   }
   useSwalOkReset(onOk, onReset)
-
-  useEffect(() => {
-    return () => {
-      URL.revokeObjectURL(formFormik.values.photo || '')
-    }
-  }, [])
+  useUnmountRevokeURL(formFormik.values.photo)
 
   return (
     <div>
