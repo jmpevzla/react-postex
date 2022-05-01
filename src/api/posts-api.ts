@@ -48,6 +48,7 @@ export async function cupdatePost(post: TPost): Promise<TPostResponse> {
     res = await axios.put<any, AxiosResponse<TPostResponse>, TPost>
       (`/posts/${post.id}`, post)
   } else {
+    post.photo = null
     res = await axios.post<any, AxiosResponse<TPostResponse>, TPostCreate>
       (`/posts`, post)
   }

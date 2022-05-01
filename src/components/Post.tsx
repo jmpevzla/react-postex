@@ -14,7 +14,7 @@ function Post({ post }: { post: TPost }) {
           md:grid-rows-none md:grid-cols-[1fr_210px]
         ">
        
-        <div className="text-left px-2 md:max-h-[calc(100vh_-_15rem)] md:overflow-y-auto">
+        <div className="text-left px-1 md:max-h-[calc(100vh_-_15rem)] md:overflow-y-auto">
           <div className="mb-3">
             <p className="font-bold text-xs select-none">ID</p>
             <p className="border-2 rounded-lg text-xl p-2">{ post.id }</p>

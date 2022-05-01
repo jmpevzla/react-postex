@@ -21,7 +21,7 @@ import SortItem from "@/components/SortItem"
 import { useSort } from "@/hooks/lists/useSort"
 import { getApiQuerySort, getQueryUrlSort
   , TSort, TSortOpts } from "@/code/lists/sort"
-import { TCupdatePostFunc, TPost, TUpdatePhotoFunc } from "@/types/posts-types"
+import { TCreatePostPhotoFunc, TCupdatePostFunc, TPost, TUpdatePhotoFunc } from "@/types/posts-types"
 import PostPhoto from "@/components/PostPhoto";
 import useInsObs from "@/hooks/useInsObs"
 import LoadingComp from "@/components/LoadingComp"
@@ -71,18 +71,28 @@ function Home() {
 
   function preparePostForm(post?: TPost) {
     
-    const onCupdate: TCupdatePostFunc = (values, dispatchConfirmEvent, setError) => {
+    const onCupdate: TCupdatePostFunc = (values, photo, dispatchConfirmEvent, setError) => {
 
       cupdatePost.mutate(values, {
-        onSuccess: () => {
+        onSuccess: (data) => {
           showSuccess((values.id ? 'Edit' : 'Create') + ' Post Successful')
-          dispatchConfirmEvent(true)
+          if (!values.id && photo) {
+            uploadPhotoPost.mutate({ id: data.id, photo }, {
+              onSuccess: () => {
+                dispatchConfirmEvent(true)    
+              }, onError: (error) => {
+                setError(error.message)
+                dispatchConfirmEvent(false)
+              }
+            })
+          } else {
+            dispatchConfirmEvent(true)
+          }
         }, onError: (error) => {
           setError(error.message)
           dispatchConfirmEvent(false)
         }
       })
-
     }
 
     const onUploadPhoto: TUpdatePhotoFunc = (id, photo, setPhoto, setError) => {
@@ -95,13 +105,18 @@ function Home() {
         }
       })
     }
+
+    // const onCreatePostPhoto: TCreatePostPhotoFunc = (photo, setPhoto, setError) => {
+
+    // }
       
     createEditForm({
       post,
       title: 'Post',
       html: (<PostForm post={post} 
         onCupdate={onCupdate} 
-        onUploadPhoto={onUploadPhoto} />),
+        onUploadPhoto={onUploadPhoto} />)
+        //onCreatePostPhoto={onCreatePostPhoto} />),
     })
   }
 

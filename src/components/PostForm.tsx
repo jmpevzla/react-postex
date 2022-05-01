@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useFormik } from 'formik'
 import { TCupdatePostFunc, TPost
   , TUpdatePhotoFunc } from '@/types/posts-types'
@@ -13,12 +13,13 @@ interface TFieldErrors {
   photo?: string
 }
 
-function PostForm({ post, onCupdate, onUploadPhoto }: 
+function PostForm({ post, onCupdate, onUploadPhoto, }:
   { post?: TPost, 
     onCupdate: TCupdatePostFunc,
     onUploadPhoto: TUpdatePhotoFunc }) {
   const [error, setError] = useState('')
   const [fieldErrors, setFieldErrors] = useState<TFieldErrors>({})
+  const createPhotoRef = useRef<File | null>(null)
 
   const validate = (values: TPost) => {
     const errors: TFieldErrors = {} 
@@ -41,7 +42,7 @@ function PostForm({ post, onCupdate, onUploadPhoto }:
     validate,
     onSubmit: async (values: TPost) => {
       setError('')
-      onCupdate(values, dispatchConfirmEvent, setError)
+      onCupdate(values, createPhotoRef.current ,dispatchConfirmEvent, setError)
     },
     onReset: () => {
       setError('')
@@ -55,14 +56,42 @@ function PostForm({ post, onCupdate, onUploadPhoto }:
   }
 
   function handleChangePhoto(ev: React.ChangeEvent<HTMLInputElement>) {
-    if (post && ev.currentTarget.files) {
-      const photo = ev.currentTarget.files[0]
+    setError('')
 
-      function setPhoto(photo: string) {
-        formFormik.setFieldValue('photo', photo)
+    let photoFile: File
+    if (ev.currentTarget.files) {
+      photoFile = ev.currentTarget.files[0]  
+      
+      switch(photoFile.type) {
+        case 'image/jpeg':
+          break
+        case 'image/png':          
+          break
+        case 'image/gif':
+          break
+        case 'image/svg+xml':
+          break
+        default:
+          return
       }
 
-      onUploadPhoto(post.id, photo, setPhoto, setError)
+      URL.revokeObjectURL(formFormik.values.photo || '')
+    } else {
+      return
+    }
+
+    function setPhoto(photo: string) {
+      formFormik.setFieldValue('photo', photo)
+    }
+    
+    if (post && ev.currentTarget.files) {
+      return onUploadPhoto(post.id, photoFile, setPhoto, setError)
+    } 
+    
+    if (ev.currentTarget.files) {
+      const url = URL.createObjectURL(photoFile)
+      formFormik.setFieldValue('photo', url)
+      createPhotoRef.current = photoFile
     }
   }
 
@@ -81,16 +110,23 @@ function PostForm({ post, onCupdate, onUploadPhoto }:
   }
   useSwalOkReset(onOk, onReset)
 
+  useEffect(() => {
+    return () => {
+      URL.revokeObjectURL(formFormik.values.photo || '')
+    }
+  }, [])
+
   return (
     <div>
       <form>
         <div className="
-          text-left px-2 mx-2 
+          text-left  
           max-h-[calc(100vh_-_15rem)] overflow-y-auto
           grid grid-rows-[1fr-275px] gap-2
-          md:grid-rows-none md:grid-cols-[1fr_210px]
+          md:grid-rows-none md:grid-cols-[1fr_210px] 
+          md:overflow-y-hidden
         ">
-          <div>
+          <div className="px-1">
             { formFormik.values.id > 0 && (
               <div className="mb-3">
                 <label htmlFor="inputId" 
