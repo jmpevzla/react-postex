@@ -13,3 +13,12 @@ type TUserReducer = [
   TUserContext | null,
   React.Dispatch<TAction<TUserContext>>
 ] | null
+
+interface TThemeContext {
+  name: string
+}
+
+type TThemeReducer = [
+  TThemeContext | null,
+  React.Dispatch<TAction<TThemeContext>>
+] | null

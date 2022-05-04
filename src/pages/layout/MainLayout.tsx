@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useMemo, useEffect } from 'react'
 import { mdiPost } from '@mdi/js'
 import { Icon } from '@mdi/react'
 import AppLinks from '@/components/AppLinks'
@@ -11,7 +11,6 @@ function MainLayout({ children, bg = 'bg-violet-200' }:
   { children: React.ReactNode, bg?: string }) {
   const drawerToggle = useRef<HTMLInputElement>(null)
   
-
   function clickLink() {
     if (drawerToggle.current) {
       drawerToggle.current.checked = false
