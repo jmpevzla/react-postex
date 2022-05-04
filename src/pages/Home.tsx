@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, Fragment } from "react"
 import { useQueryClient } from "react-query"
 import { mdiPencil, mdiTrashCan
   , mdiPlus, mdiSort } from "@mdi/js"
@@ -21,7 +21,7 @@ import SortItem from "@/components/SortItem"
 import { useSort } from "@/hooks/lists/useSort"
 import { getApiQuerySort, getQueryUrlSort
   , TSort, TSortOpts } from "@/code/lists/sort"
-import { TCreatePostPhotoFunc, TCupdatePostFunc, TPost, TUpdatePhotoFunc } from "@/types/posts-types"
+import { TCupdatePostFunc, TPost, TUpdatePhotoFunc } from "@/types/posts-types"
 import PostPhoto from "@/components/PostPhoto";
 import useInsObs from "@/hooks/useInsObs"
 import LoadingComp from "@/components/LoadingComp"
@@ -105,10 +105,6 @@ function Home() {
         }
       })
     }
-
-    // const onCreatePostPhoto: TCreatePostPhotoFunc = (photo, setPhoto, setError) => {
-
-    // }
       
     createEditForm({
       post,
@@ -116,7 +112,6 @@ function Home() {
       html: (<PostForm post={post} 
         onCupdate={onCupdate} 
         onUploadPhoto={onUploadPhoto} />)
-        //onCreatePostPhoto={onCreatePostPhoto} />),
     })
   }
 
@@ -268,25 +263,32 @@ function Home() {
           {infPostsQuery.data?.pages.map(page => {
             
             return page.data.map(post => (
-              <div className="mb-2" key={post.id} onClick={() => openShow(post.id)}>
-                <div className="card card-side bg-base-100 shadow-xl">
-                  <PostPhoto photo={post.photo} title={post.title} />
-                  <div className="card-body">
-                    <h2 className="card-title">{ post.title }</h2>
-                    <p>{ post.author }</p>
-                    <div className="card-actions justify-end">
-                      <div className="inline-block" onClick={(ev) => ev.stopPropagation()}>
-                        <button className="btn btn-primary mr-1" onClick={() => openEdit(post.id)}>
-                          <Icon path={mdiPencil} size={1} />
-                        </button>
-                        <button className="btn btn-error" onClick={() => onDeletePost(post)}>
-                          <Icon path={mdiTrashCan} size={1} />
-                        </button>
+              <Fragment key={post.id}>
+                <div className="mb-2 lg:hidden" onClick={() => openShow(post.id)}>
+                  <div className="bg-base-100 shadow-xl">
+                  { post.title }
+                  </div>
+                </div>
+                <div className="mb-2 hidden lg:block" onClick={() => openShow(post.id)}>
+                  <div className="card card-side bg-base-100 shadow-xl">
+                    <PostPhoto photo={post.photo} title={post.title} />
+                    <div className="card-body">
+                      <h2 className="card-title">{ post.title }</h2>
+                      <p>{ post.author }</p>
+                      <div className="card-actions justify-end">
+                        <div className="inline-block" onClick={(ev) => ev.stopPropagation()}>
+                          <button className="btn btn-primary mr-1" onClick={() => openEdit(post.id)}>
+                            <Icon path={mdiPencil} size={1} />
+                          </button>
+                          <button className="btn btn-error" onClick={() => onDeletePost(post)}>
+                            <Icon path={mdiTrashCan} size={1} />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              </Fragment>
             ))
 
           })}
