@@ -30,7 +30,7 @@ function PostPhotoShow({ photo, title, onIsLoad }:
               'max-w-[250px] max-h-[250px] md:max-w-[210px] md:max-h-[210px]'])}
           />
         ) : (
-          <img src={noPhotoImage} 
+          <img src={noPhotoImage} ref={imgRef} 
             alt={`No Photo Post ${title}`} 
             className={classNames([styles.posts, 
               'max-w-[250px] max-h-[250px] md:max-w-[190px] md:max-h-[190px]'])}

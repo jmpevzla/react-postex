@@ -44,12 +44,13 @@ function PostForm({ idPost, onCupdate, onUploadPhoto, setPostQuery }:
   
   const formFormik = useFormik<TPost>({
     initialValues: {
-      id: 0,
-      title: '',
-      author: '',
-      photo: null
+      id: post?.id || 0,
+      title: post?.title || '',
+      author: post?.author || '',
+      photo: post?.photo || null
     },
     validate,
+    enableReinitialize: true,
     onSubmit: async (values: TPost) => {
       setError('')
       onCupdate(values, createPhotoRef.current, dispatchConfirmEvent, setError)
@@ -59,12 +60,6 @@ function PostForm({ idPost, onCupdate, onUploadPhoto, setPostQuery }:
       setFieldErrors({})
     } 
   })
-  
-  useEffect(() => {
-    if (post) {
-      formFormik.setValues(post)
-    }
-  }, [post])
 
   function dispatchConfirmEvent(value: boolean) {
     const ev = new CustomEvent('modal-confirm', { detail: value })
@@ -113,7 +108,7 @@ function PostForm({ idPost, onCupdate, onUploadPhoto, setPostQuery }:
   useSwalOkReset(onOk, onReset)
   useUnmountRevokeURL(formFormik.values.photo)
 
-  if (loading) {
+  if (idPost > 0 && loading) {
     return <LoadingComp />
   }
 
