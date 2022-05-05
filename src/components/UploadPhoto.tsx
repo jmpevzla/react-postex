@@ -1,15 +1,22 @@
 import { mdiUpload } from "@mdi/js"
 import Icon from "@mdi/react"
 import NoPhoto from "@/assets/no-photo.jpg"
-import React from "react"
+import React, { useState } from "react"
 import PostPhotoShow from "./PostPhotoShow"
 
 export default UploadPhoto
 
 function UploadPhoto({ onChange, title, photo }:
   { onChange: (ev: React.ChangeEvent<HTMLInputElement>) => void,
-    title: string, photo: string | null 
+    title: string, photo: string | null
   }) {
+
+  const [load, setLoad] = useState(false)
+
+  function onIsLoad(value: boolean) {
+    setLoad(value)
+  }
+
   return (
     <>
       <input id="inputPhoto" type="file" 
@@ -23,15 +30,15 @@ function UploadPhoto({ onChange, title, photo }:
           title="Upload Photo">
           
           <label htmlFor="inputPhoto">
-            <PostPhotoShow photo={photo} title={title} />
+            <PostPhotoShow photo={photo} title={title} onIsLoad={onIsLoad} />
           </label>
         </div>
-        <div>
+        {load && <div>
           <label htmlFor="inputPhoto" 
             className="btn btn-info !min-h-0 h-8 tracking-wider text-sm">
             <Icon path={mdiUpload} size={1} /> Photo
           </label>
-        </div>
+        </div>}
       </div>
     </>
   )

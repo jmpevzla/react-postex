@@ -1,14 +1,17 @@
 import { useState, useRef, useEffect } from 'react'
 import { useFormik } from 'formik'
 import { TCupdatePostFunc, TPost
-  , TUpdatePhotoFunc } from '@/types/posts-types'
+  , TUpdatePhotoFunc, 
+  TUsePostId} from '@/types/posts-types'
 
 import useSwalOkReset from '@/hooks/useSwalOkReset'
 import UploadPhoto from './UploadPhoto'
 import { checkFilesExist, checkPhotos, createURL
-  , getSimpleFile, revokeURL } from '@/code/file'
+  , getSimpleFile } from '@/code/file'
 import { getInputEventFile } from '@/code/event'
 import useUnmountRevokeURL from '@/hooks/useUnmountRevokeURL'
+import useLoadPost from '@/hooks/posts/useLoadPost'
+import LoadingComp from './LoadingComp'
 
 export default PostForm
 interface TFieldErrors {
@@ -17,13 +20,16 @@ interface TFieldErrors {
   photo?: string
 }
 
-function PostForm({ post, onCupdate, onUploadPhoto, }:
-  { post?: TPost, 
+function PostForm({ idPost, onCupdate, onUploadPhoto, setPostQuery }:
+  { idPost: number, 
     onCupdate: TCupdatePostFunc,
-    onUploadPhoto: TUpdatePhotoFunc }) {
+    onUploadPhoto: TUpdatePhotoFunc, 
+    setPostQuery: TUsePostId }) {
+  
   const [error, setError] = useState('')
   const [fieldErrors, setFieldErrors] = useState<TFieldErrors>({})
   const createPhotoRef = useRef<File | null>(null)
+  const [post, loading] = useLoadPost(idPost, setPostQuery)
 
   const validate = (values: TPost) => {
     const errors: TFieldErrors = {} 
@@ -38,15 +44,15 @@ function PostForm({ post, onCupdate, onUploadPhoto, }:
   
   const formFormik = useFormik<TPost>({
     initialValues: {
-      id: post?.id || 0,
-      title: post?.title || '',
-      author: post?.author || '',
-      photo: post?.photo || null
+      id: 0,
+      title: '',
+      author: '',
+      photo: null
     },
     validate,
     onSubmit: async (values: TPost) => {
       setError('')
-      onCupdate(values, createPhotoRef.current ,dispatchConfirmEvent, setError)
+      onCupdate(values, createPhotoRef.current, dispatchConfirmEvent, setError)
     },
     onReset: () => {
       setError('')
@@ -54,6 +60,12 @@ function PostForm({ post, onCupdate, onUploadPhoto, }:
     } 
   })
   
+  useEffect(() => {
+    if (post) {
+      formFormik.setValues(post)
+    }
+  }, [post])
+
   function dispatchConfirmEvent(value: boolean) {
     const ev = new CustomEvent('modal-confirm', { detail: value })
     return window.dispatchEvent(ev)
@@ -100,6 +112,10 @@ function PostForm({ post, onCupdate, onUploadPhoto, }:
   }
   useSwalOkReset(onOk, onReset)
   useUnmountRevokeURL(formFormik.values.photo)
+
+  if (loading) {
+    return <LoadingComp />
+  }
 
   return (
     <div>
@@ -157,7 +173,8 @@ function PostForm({ post, onCupdate, onUploadPhoto, }:
           <div className="mb-3 flex justify-center">
             <UploadPhoto onChange={handleChangePhoto} 
               title={formFormik.values.title} 
-              photo={formFormik.values.photo} />
+              photo={formFormik.values.photo}
+             />
             
             {/*fieldErrors.photo && <p className="text-error">* {fieldErrors.photo}</p>*/}
           </div>

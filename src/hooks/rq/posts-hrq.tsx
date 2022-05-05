@@ -82,33 +82,6 @@ export function useUploadPhotoPost(queryClient: QueryClient) {
   })
 }
 
-export function usePostId2( 
-  onSuccess: (post: TPost) => void):
-React.Dispatch<React.SetStateAction<number>> {
-  const [postStId, setPostStId] = useState(0)
-  const postQuery = usePost(postStId)
-
-  useEffect(() => {
-    async function init() { 
-      let postQ = postQuery
-      if (postQuery.isStale) {
-        postQ = await postQuery.refetch()
-      }
-      
-      if (postQ.isSuccess) {
-        onSuccess(postQ.data)
-      } else {
-        showError(postQ.error?.message || 'Error fetch data, Try Again!')
-      }
-      setPostStId(0)
-    }
-
-    postStId > 0 && init()
-  }, [postStId])
-
-  return setPostStId
-}
-
 export function usePostId(): TUsePostId {
   const [postStId, setPostStId] = useState({
     id: 0,

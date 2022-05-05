@@ -1,8 +1,7 @@
-import { TPost, TUsePostId } from "@/types/posts-types"
+import { TUsePostId } from "@/types/posts-types"
 import PostPhotoShow from "./PostPhotoShow"
-import { useEffect, useState } from "react"
 import LoadingComp from "./LoadingComp"
-import { setSessionEntity } from "@/extras/storage-extras"
+import useLoadPost from "@/hooks/posts/useLoadPost"
 
 export default Post
 
@@ -10,31 +9,11 @@ function Post({ idPost, setPostQuery }:
   { idPost: number, 
     setPostQuery: TUsePostId
   }) {
-  const [loading, setLoading] = useState(true)
-  const [post, setPost] = useState<TPost|null>(null)
-
-  useEffect(() => {
-
-    function onSuccess(data: TPost) {
-      setSessionEntity('post', data)
-      setPost(data)
-    }
-
-    function isLoading(value: boolean) {
-      setLoading(value)
-    }
-
-    setPostQuery({
-      id: idPost,
-      onSuccess,
-      isLoading
-    })
-
-  }, [])  
+  const [post, loading] = useLoadPost(idPost, setPostQuery)
   
   if (loading) {
     return <LoadingComp />
-  } 
+  }
 
   if (post) {
     return (

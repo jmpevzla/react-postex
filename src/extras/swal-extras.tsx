@@ -6,13 +6,13 @@ import { getSessionEntity, removeSessionEntity } from "./storage-extras"
 
 const reactSwal = withReactContent(Swal)
 
-export function createEditForm({ post = null, title, html }: 
-  { post?: TPost | null, title?: string, html?: React.ReactElement } = {}) {
+export function createEditForm({ id = 0, title, html }: 
+  { id?: number, title?: string, html?: React.ReactElement } = {}) {
   
   reactSwal.fire({
     title: (
       <span className="text-lg select-none">
-        { post ? 'Edit' : 'Create'} {title}
+        { id > 0 ? 'Edit' : 'Create'} {title}
       </span>
     ),
     html,
@@ -36,14 +36,14 @@ export function createEditForm({ post = null, title, html }:
       })
     },
     didOpen: () => {
-      if (post) {
-        putHashParams('edit', post.id)
+      if (id > 0) {
+        putHashParams('edit', id)
       } else {
         putHashParams('create')
       }
     },
     didDestroy: () => {
-      removeHashParams(post ? 'edit' : 'create')
+      removeHashParams(id > 0 ? 'edit' : 'create')
     }
   })
 }

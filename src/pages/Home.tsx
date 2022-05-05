@@ -14,7 +14,7 @@ import { getMixQuery, loadHashParams
   , setParamsToQueryBar } from "@/code/queryBar"
 import { useSearch } from "@/hooks/lists/useSearch"
 import { useCupdatePost, useDeletePost
-  , useInfPosts, usePostId, usePostId2, useUploadPhotoPost } from "@/hooks/rq/posts-hrq"
+  , useInfPosts, usePostId, useUploadPhotoPost } from "@/hooks/rq/posts-hrq"
 import { useQueryBar } from "@/hooks/lists/useQueryBar"
 import { useDebounce } from "@/hooks/useDebouce"
 import SortItem from "@/components/SortItem"
@@ -69,7 +69,7 @@ function Home() {
   const cupdatePost = useCupdatePost(queryClient)
   const uploadPhotoPost = useUploadPhotoPost(queryClient)
 
-  function preparePostForm(post?: TPost) {
+  function preparePostForm(idPost: number = 0) { //post?: TPost) {
     
     const onCupdate: TCupdatePostFunc = (values, photo, dispatchConfirmEvent, setError) => {
       cupdatePost.mutate(values, {
@@ -106,29 +106,20 @@ function Home() {
     }
       
     createEditForm({
-      post,
+      id: idPost,
       title: 'Post',
-      html: (<PostForm post={post} 
+      html: (<PostForm idPost={idPost} 
         onCupdate={onCupdate} 
-        onUploadPhoto={onUploadPhoto} />)
+        onUploadPhoto={onUploadPhoto} 
+        setPostQuery={setPostIdEditQuery}
+        />)
     })
 
   }
 
-  function onSuccessPostEditId(post: TPost) {
-    preparePostForm(post)
-  }
-  const setPostEditId = usePostId2(onSuccessPostEditId)
+  const setPostIdEditQuery = usePostId()
   
-  function preparePostShow(idPost: number) {  //post: TPost) {
-    // showForm({
-    //   post,
-    //   title: 'Post',
-    //   html: (<Post post={post} />),
-    //   onEdit: () => openEdit(post.id),
-    //   onDelete: () => onDeletePost(post)
-    // })
-
+  function preparePostShow(idPost: number) {
     showForm({
       id: idPost,
       title: 'Post',
@@ -138,11 +129,7 @@ function Home() {
       onDelete: (post: TPost) => onDeletePost(post)
     })
   }
-  // function onSuccessPostShowId(post: TPost) {
-  //   preparePostShow(post)
-  // }
-  //const [setPostShowId, PostIdQuery] = usePostId(onSuccessPostShowId)
-  //const postIdQuery = usePostId(onSuccessPostShowId)
+  
   const setPostIdShowQuery = usePostId()
 
   const deletePost = useDeletePost(queryClient)
@@ -177,11 +164,10 @@ function Home() {
   }
 
   function openEdit(postId: number) {
-    setPostEditId(postId)
+    preparePostForm(postId)
   }
 
   function openShow(postId: number) {
-    //setPostShowId(postId)
     preparePostShow(postId)
   }
 
