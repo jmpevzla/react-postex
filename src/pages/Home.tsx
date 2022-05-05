@@ -14,7 +14,7 @@ import { getMixQuery, loadHashParams
   , setParamsToQueryBar } from "@/code/queryBar"
 import { useSearch } from "@/hooks/lists/useSearch"
 import { useCupdatePost, useDeletePost
-  , useInfPosts, usePostId, useUploadPhotoPost } from "@/hooks/rq/posts-hrq"
+  , useInfPosts, usePostId, usePostId2, useUploadPhotoPost } from "@/hooks/rq/posts-hrq"
 import { useQueryBar } from "@/hooks/lists/useQueryBar"
 import { useDebounce } from "@/hooks/useDebouce"
 import SortItem from "@/components/SortItem"
@@ -72,7 +72,6 @@ function Home() {
   function preparePostForm(post?: TPost) {
     
     const onCupdate: TCupdatePostFunc = (values, photo, dispatchConfirmEvent, setError) => {
-
       cupdatePost.mutate(values, {
         onSuccess: (data) => {
           showSuccess((values.id ? 'Edit' : 'Create') + ' Post Successful')
@@ -113,26 +112,38 @@ function Home() {
         onCupdate={onCupdate} 
         onUploadPhoto={onUploadPhoto} />)
     })
+
   }
 
   function onSuccessPostEditId(post: TPost) {
     preparePostForm(post)
   }
-  const setPostEditId = usePostId(onSuccessPostEditId)
+  const setPostEditId = usePostId2(onSuccessPostEditId)
   
-  function preparePostShow(post: TPost) {
+  function preparePostShow(idPost: number) {  //post: TPost) {
+    // showForm({
+    //   post,
+    //   title: 'Post',
+    //   html: (<Post post={post} />),
+    //   onEdit: () => openEdit(post.id),
+    //   onDelete: () => onDeletePost(post)
+    // })
+
     showForm({
-      post,
+      id: idPost,
       title: 'Post',
-      html: (<Post post={post} />),
-      onEdit: () => openEdit(post.id),
-      onDelete: () => onDeletePost(post)
+      html: (<Post idPost={idPost}
+                setPostQuery={setPostIdShowQuery} />),
+      onEdit: () => openEdit(idPost),
+      onDelete: (post: TPost) => onDeletePost(post)
     })
   }
-  function onSuccessPostShowId(post: TPost) {
-    preparePostShow(post)
-  }
-  const setPostShowId = usePostId(onSuccessPostShowId)
+  // function onSuccessPostShowId(post: TPost) {
+  //   preparePostShow(post)
+  // }
+  //const [setPostShowId, PostIdQuery] = usePostId(onSuccessPostShowId)
+  //const postIdQuery = usePostId(onSuccessPostShowId)
+  const setPostIdShowQuery = usePostId()
 
   const deletePost = useDeletePost(queryClient)
 
@@ -170,7 +181,8 @@ function Home() {
   }
 
   function openShow(postId: number) {
-    setPostShowId(postId)    
+    //setPostShowId(postId)
+    preparePostShow(postId)
   }
 
   function onDeletePost(post: TPost) {

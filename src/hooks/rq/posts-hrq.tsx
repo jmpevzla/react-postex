@@ -4,7 +4,7 @@ import { useQuery, useInfiniteQuery, QueryFunctionContext
 
 import { TError, TQuery } from "@/types/api-types"
 import { TPhotoPost, TPhotoPostMutation
-  , TPost, TPostsInf, TPosts } from "@/types/posts-types"
+  , TPost, TPostsInf, TPosts, TUsePostId } from "@/types/posts-types"
 import { cupdatePost, deletePost
   , getPost, getPosts, uploadPhotoPost } from "@/api/posts-api"
 import { infPlaceholder, postKey
@@ -82,7 +82,7 @@ export function useUploadPhotoPost(queryClient: QueryClient) {
   })
 }
 
-export function usePostId( 
+export function usePostId2( 
   onSuccess: (post: TPost) => void):
 React.Dispatch<React.SetStateAction<number>> {
   const [postStId, setPostStId] = useState(0)
@@ -105,6 +105,38 @@ React.Dispatch<React.SetStateAction<number>> {
 
     postStId > 0 && init()
   }, [postStId])
+
+  return setPostStId
+}
+
+export function usePostId(): TUsePostId {
+  const [postStId, setPostStId] = useState({
+    id: 0,
+    onSuccess: (data: TPost) => {},
+    isLoading: (value: boolean) => {}
+  })
+  const postQuery = usePost(postStId.id)
+
+  useEffect(() => {
+    async function init() {
+      postStId.isLoading(true) 
+      let postQ = postQuery
+      if (postQuery.isStale) {
+        postQ = await postQuery.refetch()
+      }
+      
+      if (postQ.isSuccess) {
+        postStId.onSuccess(postQ.data)
+      } else {
+        showError(postQ.error?.message || 'Error fetch data, Try Again!')
+      }
+
+      postStId.isLoading(false)
+      setPostStId({ ...postStId, id: 0 })
+    }
+
+    postStId.id > 0 && init()
+  }, [postStId.id])
 
   return setPostStId
 }

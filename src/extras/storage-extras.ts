@@ -53,3 +53,26 @@ export function isThemeLight() {
 export function isThemeDark() {
   return window.localStorage.getItem('theme') === 'dark'
 }
+
+export function setSessionEntity(name: string, entity: Record<string, any>) {
+  try {
+    window.sessionStorage.setItem(name, JSON.stringify(entity))
+  } catch(err) {
+    const error = err as Error
+    console.error(error)
+    Swal.fire('Error in sessionStorage', error.message, 'error')
+  }
+}
+
+export function getSessionEntity<T>(name: string): T | null {
+  const str = window.sessionStorage.getItem(name)
+  if (str) {
+    const ent = JSON.parse(str)
+    return ent as T
+  }
+  return null
+}
+
+export function removeSessionEntity(name: string) {
+  window.sessionStorage.removeItem(name)
+}

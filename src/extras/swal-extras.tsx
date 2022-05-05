@@ -2,6 +2,7 @@ import Swal from "sweetalert2"
 import withReactContent from "sweetalert2-react-content"
 import { TPost } from "@/types/posts-types"
 import { putHashParams, removeHashParams } from "@/code/queryBar"
+import { getSessionEntity, removeSessionEntity } from "./storage-extras"
 
 const reactSwal = withReactContent(Swal)
 
@@ -47,9 +48,10 @@ export function createEditForm({ post = null, title, html }:
   })
 }
 
-export async function showForm({ post, title, html, onEdit, onDelete }: 
-  { post: TPost, title?: string, html?: React.ReactElement
-  , onEdit: () => void, onDelete: () => void }) {
+export async function showForm({ id, title, html, onEdit, onDelete }:   
+  { id: number, title?: string, html?: React.ReactElement
+  , onEdit: () => void, onDelete: (post: TPost) => void }) {
+  
   const res = await reactSwal.fire({
     title: (
       <span className="text-lg select-none">
@@ -64,9 +66,10 @@ export async function showForm({ post, title, html, onEdit, onDelete }:
     confirmButtonText: 'Ok',
     reverseButtons: true,
     didOpen: () => {
-      putHashParams('show', post.id)
+      putHashParams('show', id)
     },
     didDestroy: () => {
+      removeSessionEntity('post')
       removeHashParams('show')
     }
   })
@@ -76,7 +79,8 @@ export async function showForm({ post, title, html, onEdit, onDelete }:
   }
 
   if (res.isDenied) {
-    onDelete()
+    const post = getSessionEntity<TPost>('post') 
+    post && onDelete(post)
   }
 }
 
