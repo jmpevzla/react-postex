@@ -21,6 +21,7 @@ function PostPhoto({ photo, title, size }:
       ) : (
         <img src={noPhotoImage} 
           alt={`No Photo Post ${title}`} 
+          style={size ? { width: size, height: size } : {}}
           className={classNames([styles.posts, 'w-[210px] h-[210px]'])}
         />
       )}
