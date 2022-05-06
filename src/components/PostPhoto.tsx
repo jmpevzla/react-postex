@@ -7,13 +7,15 @@ import styles from "@/styles/PostPhoto.module.css"
 
 export default PostPhoto
 
-function PostPhoto({ photo, title }: { photo: string | null, title: string }) {
+function PostPhoto({ photo, title, size }: 
+  { photo: string | null, title: string, size?: string }) {
   return (
     <figure>
       {photo ? (
         <img data-src={photo} 
           src={loadingImage}
           alt={`Post ${title}`}
+          style={size ? { width: size, height: size } : {}}
           className={classNames([styles['posts-photo'], styles.posts, 'lazyload'])}
         />
       ) : (

@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState, Fragment } from "react"
+import { useEffect, useRef, useState
+  , Fragment } from "react"
 import { useQueryClient } from "react-query"
 import { mdiPencil, mdiTrashCan
   , mdiPlus, mdiSort } from "@mdi/js"
@@ -262,11 +263,29 @@ function Home() {
             
             return page.data.map(post => (
               <Fragment key={post.id}>
+                
                 <div className="mb-2 lg:hidden" onClick={() => openShow(post.id)}>
-                  <div className="bg-base-100 shadow-xl">
-                  { post.title }
+                  <div className="
+                    card card-compact card-side 
+                    w-full bg-base-100 shadow-xl pl-2">
+                    <PostPhoto photo={post.photo} title={post.title} size="100px" />
+                    <div className="card-body !py-3 !px-2">
+                      <h2 className="card-title break-all">{ post.title }</h2>
+                      <p className="break-all">{ post.author }</p>
+                      <div className="card-actions justify-end">
+                        <div className="inline-block" onClick={(ev) => ev.stopPropagation()}>
+                          <button className="btn btn-primary mr-2 h-8 min-h-8" onClick={() => openEdit(post.id)}>
+                            <Icon path={mdiPencil} size={0.75} />
+                          </button>
+                          <button className="btn btn-error h-8 min-h-8" onClick={() => onDeletePost(post)}>
+                            <Icon path={mdiTrashCan} size={0.75} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
+
                 <div className="mb-2 hidden lg:block" onClick={() => openShow(post.id)}>
                   <div className="card card-side bg-base-100 shadow-xl">
                     <PostPhoto photo={post.photo} title={post.title} />
@@ -286,6 +305,7 @@ function Home() {
                     </div>
                   </div>
                 </div>
+
               </Fragment>
             ))
 
