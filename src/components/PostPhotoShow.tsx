@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import 'lazysizes'
 import 'lazysizes/plugins/attrchange/ls.attrchange';
 import classNames from 'classnames';
@@ -5,7 +6,6 @@ import noPhotoImage from "@/assets/no-photo.jpg"
 import styles from "@/styles/PostPhoto.module.css"
 import loadingStyles from "@/styles/Loading.module.css"
 import useLoadingImg from '@/hooks/useLoadingImg';
-import { useEffect } from 'react';
 
 export default PostPhotoShow
 

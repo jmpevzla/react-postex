@@ -1,7 +1,7 @@
 import { AxiosResponse } from 'axios'
 import { TQuery } from '@/types/api-types'
 import { TPostsResponse, TPostResponse, TPost, 
-  TPostCreate, TPhotoPostResponse, TPostsTotalResponse, TPhotoPost } from '@/types/posts-types'
+  TPostCreate, TPhotoPostResponse, TPostsTotalResponse } from '@/types/posts-types'
 import axios, { axiosUpload } from './extras/get-axios'
 import { getTotalCount } from './extras/utils-api'
 import { preparePhoto } from '@/code/entities/post'

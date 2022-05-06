@@ -1,15 +1,12 @@
 import { useContext, useEffect, useState } from "react"
 import { Route, RouteProps, useLocation } from "wouter"
-import { isEqual } from "lodash"
-import { useQueryClient } from "react-query"
-import { clearUserAction, setUserAction, userContext } from "@/contexts/userContext"
+import { setUserAction, userContext } from "@/contexts/userContext"
 import SUnauthorizated from "@/suspensePages/SUnauthorizated"
 import Loading from "@/pages/Loading"
 import { getStUserId
-  , clearStUser, stOkLogin } from "@/extras/storage-extras"
+  , clearStUser } from "@/extras/storage-extras"
 import { useUser } from "@/hooks/rq/auth-hrq"
 import SPageError from "@/suspensePages/SPageError"
-import Login from "@/pages/Login"
 
 export default RouteAuth
 
@@ -76,8 +73,6 @@ function RouteAuth(props: RouteProps) {
     }
     
   })
-
-  //console.log('USER::', user, userApi)
 
   switch(auth) {
     case LOGGED:
