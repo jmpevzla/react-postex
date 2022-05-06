@@ -2,7 +2,6 @@ import { useCallback, useContext } from 'react'
 import { Link, useLocation } from 'wouter'
 import { useFormik } from 'formik'
 import { useQueryClient } from 'react-query'
-import Swal from 'sweetalert2'
 import { setUserAction, userContext } from '@/contexts/userContext'
 import type { TSignUp } from '@/types/auth-types'
 import { setStUser } from '@/extras/storage-extras'
@@ -10,6 +9,7 @@ import { useRegister } from '@/hooks/rq/auth-hrq'
 import MainLayout from './layout/MainLayout'
 import AuthLayout from './layout/AuthLayout'
 import useAuthInit from '@/hooks/useAuthInit'
+import { showSuccess } from '@/extras/swal-extras'
 
 export default Register
 
@@ -59,18 +59,7 @@ function Register() {
       
       register.mutate(values, {
         onSuccess: async (data) => {
-          await Swal.fire({
-            title: 'Success!',
-            icon: 'success',
-            text: data.message,
-            background: 'var(--background-auth)',
-            color: 'var(--txt)',
-            toast: true,
-            timerProgressBar: true,
-            timer: 2000,
-            position: 'top',
-            showConfirmButton: false
-          })
+          await showSuccess(data.message)
 
           userDispatch({
             type: setUserAction,

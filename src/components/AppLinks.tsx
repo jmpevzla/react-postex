@@ -1,11 +1,11 @@
-import { useContext, useEffect, useState } from 'react'
+import { useContext } from 'react'
 import { useQueryClient } from 'react-query'
 import { useLocation } from 'wouter'
-import Swal from 'sweetalert2'
-import { clearUserAction, userContext } from '@/contexts/userContext'
+import { userContext } from '@/contexts/userContext'
 import MenuLink from './MenuLink'
 import { useLogout } from '@/hooks/rq/auth-hrq'
 import { clearStUser } from '@/extras/storage-extras'
+import { showLogout } from '@/extras/swal-extras'
 
 export default AppLinks
 
@@ -18,25 +18,16 @@ function AppLinks({ onClickLink = () => {} }:
 
   async function onLogout() {
     onClickLink()
-    const confirm = await Swal.fire({
-      title: 'Are you sure?',
-      icon: 'question',
-      text: "Do you want logout now?",
-      background: 'var(--background-auth)',
-      color: 'var(--txt)',
-      showConfirmButton: true,
-      showCancelButton: true,
-      reverseButtons: true,
+    showLogout({ 
+      onConfirm: () => {
+        logout.mutate(undefined, {
+          onSuccess: () => {
+            clearStUser()
+            setLocation('/login')
+          }
+        })  
+      }
     })
-    
-    if (confirm.isConfirmed) {
-      logout.mutate(undefined, {
-        onSuccess: () => {
-          clearStUser()
-          setLocation('/login')
-        }
-      })
-    }
   }
 
   if (user == null) {

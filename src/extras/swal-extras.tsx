@@ -135,3 +135,22 @@ export async function showDelete({ title, html, onDelete }:
     onDelete()
   }
 }
+
+export async function showLogout({ onConfirm }:
+  { onConfirm: () => void }) {
+
+  const confirm = await Swal.fire({
+    title: 'Are you sure?',
+    icon: 'question',
+    text: "Do you want logout now?",
+    background: 'var(--background-auth)',
+    color: 'var(--txt)',
+    showConfirmButton: true,
+    showCancelButton: true,
+    reverseButtons: true,
+  })
+  
+  if (confirm.isConfirmed) {
+    onConfirm()
+  }
+}
