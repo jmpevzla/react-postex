@@ -63,6 +63,8 @@ function Register() {
             title: 'Success!',
             icon: 'success',
             text: data.message,
+            background: 'var(--background-auth)',
+            color: 'var(--txt)',
             toast: true,
             timerProgressBar: true,
             timer: 2000,

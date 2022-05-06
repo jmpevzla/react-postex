@@ -47,7 +47,7 @@ function ToggleTheme() {
   return (
     
     <div>
-      🌞 
+      <span className="text-sun">🌞</span> 
       <div className="inline-block w-10"> 
         <span data-toggle-theme="dark,light" 
         data-act-class="!pl-4"
@@ -61,7 +61,7 @@ function ToggleTheme() {
           <span className="rounded-full w-3 h-3 m-1 bg-accent"></span> 
         </span> 
       </div>
-      🌚 
+      <span className="text-moon">🌚</span> 
     </div>
 
   )

@@ -16,6 +16,8 @@ export function createEditForm({ id = 0, title, html }:
       </span>
     ),
     html,
+    background: 'var(--background-auth)',
+    color: 'var(--txt)',
     showCancelButton: true,
     showDenyButton: true,
     confirmButtonText: 'Ok',
@@ -59,6 +61,8 @@ export async function showForm({ id, title, html, onEdit, onDelete }:
       </span>
     ),
     html,
+    background: 'var(--background-auth)',
+    color: 'var(--txt)',
     showCancelButton: true,
     showDenyButton: true,
     cancelButtonText: 'Edit',
@@ -89,6 +93,8 @@ export async function showSuccess(message: string) {
     title: "Success!",
     icon: "success",
     text: message,
+    background: 'var(--background-auth)',
+    color: 'var(--txt)',
     toast: true,
     timerProgressBar: true,
     timer: 1000,
@@ -102,6 +108,8 @@ export async function showError(message: string) {
     title: "Error",
     icon: "error",
     text: message,
+    background: 'var(--background-auth)',
+    color: 'var(--txt)',
     toast: true,
     timerProgressBar: true,
     timer: 3000,
@@ -116,8 +124,11 @@ export async function showDelete({ title, html, onDelete }:
     title: "Delete " + title,
     icon: "question",
     html,
+    background: 'var(--background-auth)',
+    color: 'var(--txt)',
     showCancelButton: true,
     showConfirmButton: true,
+    reverseButtons: true,
   })
 
   if (conf.isConfirmed) {

@@ -6,7 +6,12 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        main: "var(--background-main)"
+        main: "var(--background-main)",
+        auth: "var(--background-auth)",
+        input: "var(--input)",
+        txt: "var(--txt)",
+        sun: "var(--sun)",
+        moon: "var(--moon)",
       }
     },
   },

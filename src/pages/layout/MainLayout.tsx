@@ -18,7 +18,7 @@ function MainLayout({ children, bg = 'bg-main' }: //'bg-violet-200' }:
   }
 
   return (
-    <div className={`drawer drawer-end min-h-screen ${bg}`}>
+    <div className={`drawer drawer-end min-h-screen ${bg} text-txt`}>
       <input id="postex-drawer" ref={drawerToggle} 
         type="checkbox" className="drawer-toggle" />
       <div className="drawer-content flex flex-col px-3">

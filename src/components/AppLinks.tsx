@@ -22,8 +22,11 @@ function AppLinks({ onClickLink = () => {} }:
       title: 'Are you sure?',
       icon: 'question',
       text: "Do you want logout now?",
+      background: 'var(--background-auth)',
+      color: 'var(--txt)',
       showConfirmButton: true,
-      showCancelButton: true
+      showCancelButton: true,
+      reverseButtons: true,
     })
     
     if (confirm.isConfirmed) {

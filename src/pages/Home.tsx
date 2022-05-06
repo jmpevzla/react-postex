@@ -229,7 +229,7 @@ function Home() {
                 form-control input-primary mr-2 
                 p-2 rounded-xl flex-1
                 outline-2 outline-double outline-gray-500
-                w-full
+                w-full bg-input text-txt
               " 
             />
             <div className="dropdown dropdown-end">

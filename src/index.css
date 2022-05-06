@@ -24,10 +24,20 @@
   background: #444;
 }
 
-/* [data-theme=light] {
-  --background-main: #ddd6fe
+[data-theme=light] {
+  --background-main: #ddd6fe;
+  --background-auth: #ffffff;
+  --input: #ffffff;
+  --txt: #000000;
+  --sun: #000000;
+  --moon: #000000;
 }
 
 [data-theme=dark] {
-  --background-main: #000000
-} */
+  --background-main: #000000;
+  --background-auth: #000000;
+  --input: #000000;
+  --txt: #dddddd;
+  --sun: #fcd34d;
+  --moon: #ffffff;
+}

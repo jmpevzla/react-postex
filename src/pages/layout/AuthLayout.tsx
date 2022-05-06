@@ -7,7 +7,7 @@ function AuthLayout({ children }: { children: React.ReactNode }) {
   
   return (
     
-      <div className="mx-4 bg-white rounded-xl my-4">
+      <div className="mx-4 bg-auth rounded-xl my-4">
         <div className="flex flex-row">
           <div 
             className="
