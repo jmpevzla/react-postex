@@ -24,3 +24,10 @@
   background: #444;
 }
 
+/* [data-theme=light] {
+  --background-main: #ddd6fe
+}
+
+[data-theme=dark] {
+  --background-main: #000000
+} */

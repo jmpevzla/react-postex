@@ -19,5 +19,5 @@ function RouteTitleAuth(props: RouteTypeProps) {
 
   return useMemo(() =>
     <RouteAuth path={props.path} component={FuncComponent(component, props.title)} />
-  , [])
+  , [props.title])
 }
