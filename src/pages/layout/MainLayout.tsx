@@ -1,4 +1,4 @@
-import { useRef, useMemo, useEffect } from 'react'
+import { useRef } from 'react'
 import { mdiPost } from '@mdi/js'
 import { Icon } from '@mdi/react'
 import AppLinks from '@/components/AppLinks'
@@ -7,7 +7,7 @@ import ToggleTheme from '@/components/ToggleTheme'
 
 export default MainLayout
 
-function MainLayout({ children, bg = 'bg-main' }: //'bg-violet-200' }: 
+function MainLayout({ children, bg = 'bg-main' }:
   { children: React.ReactNode, bg?: string }) {
   const drawerToggle = useRef<HTMLInputElement>(null)
   

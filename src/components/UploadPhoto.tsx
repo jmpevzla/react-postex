@@ -1,7 +1,6 @@
+import { useState } from "react"
 import { mdiUpload } from "@mdi/js"
-import Icon from "@mdi/react"
-import NoPhoto from "@/assets/no-photo.jpg"
-import React, { useState } from "react"
+import { Icon } from "@mdi/react"
 import PostPhotoShow from "./PostPhotoShow"
 
 export default UploadPhoto

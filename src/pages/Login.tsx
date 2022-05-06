@@ -10,6 +10,7 @@ import MainLayout from "@/pages/layout/MainLayout";
 import AuthLayout from "./layout/AuthLayout";
 import useAuthInit from "@/hooks/useAuthInit";
 import { showSuccess } from "@/extras/swal-extras";
+import HeaderAuth from "@/components/HeaderAuth";
 
 export default Login;
 
@@ -64,18 +65,10 @@ function Login() {
     return (
       <MainLayout>
         <AuthLayout>
-          <div className="my-10 mx-4">
-            <header>
-              <p className="text-xl">Hello !</p>
-              <p className="text-violet-600 font-bold text-2xl">
-                Welcome to Postex.io
-              </p>
-              <h1 className="text-center text-lg mt-4">
-                <span className="text-violet-700">Login</span> Your Account
-              </h1>
-            </header>
+          <div className="my-10 md:mx-4">
+            <HeaderAuth text="Login" />
 
-            <form className="mx-8" onSubmit={formFormik.handleSubmit}>
+            <form className="md:mx-8" onSubmit={formFormik.handleSubmit}>
               <div className="my-3">
                 <input
                   id="email"
